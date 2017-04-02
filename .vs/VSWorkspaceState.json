@@ -2,7 +2,9 @@
   "ExpandedNodes": [
     "",
     "\\TextAdventure",
+    "\\TextAdventure\\TextAdventure",
     "\\TextAdventure\\TextAdventure\\TextAdventure"
   ],
+  "SelectedNode": "\\TextAdventure\\TextAdventure\\TextAdventure\\TextAdventure.cpp",
   "PreviewInSolutionExplorer": false
 }
