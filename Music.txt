@@ -1,0 +1,2 @@
+chrome-extension://klbibkeccnjlkjkiokjodocebajanakg/suspended.html#uri=http://freemusicarchive.org/genre/Chiptune/?sort=track_date_published&d=1&page=1&per_page=200
+http://freemusicarchive.org/music/Visager/
