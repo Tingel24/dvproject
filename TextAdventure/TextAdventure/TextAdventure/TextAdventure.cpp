@@ -5,6 +5,7 @@
 #include <iostream>
 #include "windows.h"
 using namespace std;
+#define _CRT_SECURE_NO_WARNINGS
 
 void intro();
 void testscreen();
@@ -22,27 +23,30 @@ int main()
 {
 	testscreen();
 	intro();
+
+	char loc[10];
+	getloc(loc, 1);
+	cout << loc << endl;
+	system("Pause");
+
 	mainmenu();
-
-
-
-	char picture[] = { R"foo(   
-      ,,,,
-     /   '
-    /.. /
-   ( c  D
-    \- '\_
-     `-'\)\
-        |_ \
-        |U \\
-       (__,//
-       |. \/
-       LL__I
-        |||
-        |||
-       -``'
-)foo" };
-	drawscreen(picture);
+//	char picture[] = { R"foo(   
+//      ,,,,
+//     /   '
+//    /.. /
+//   ( c  D
+//    \- '\_
+//     `-'\)\
+//        |_ \
+//        |U \\
+//       (__,//
+//       |. \/
+//       LL__I
+//        |||
+//        |||
+//       -``'
+//)foo" };
+//	drawscreen(picture);
     return 0;
 }
 
@@ -120,13 +124,14 @@ void drawscreen(char picture[]) {
 )foo";
 }
 
-void getloc(char[],int j) {
-	char newloc[10];
+void getloc(char newloc[],int j) {
 	FILE *datei;
-	if ((datei = fopen("locations.dat", "r")) == NULL) {
+	/*if ((fopen_s(&datei, "locations.dat", "ab")) == NULL) {
 		fprintf(stderr, "Fehler bei der Dateioeffnung von location.dat");
-	}
-	fread(&newloc, sizeof(char[10]), j, datei);
+		cout << "Fehler bei der Dateioeffnung von location.dat" << endl;
+	}*/
+	fread(&newloc, sizeof(char[10]),j,datei);
+	fclose(datei);
 }
 
 void startgame() {
@@ -165,10 +170,13 @@ void setloc() {
 	cout << "Enter new location name(not more than 10 characters):";
 	cin >> newloc;
 	FILE *datei;
-	if ((datei = fopen("locations.dat", "a")) == NULL) {
-		fprintf(stderr, "Fehler bei der Dateioeffnung von location.dat");
-	}
-	fwrite(&newloc, sizeof(char[10]), 1, datei);
+	fopen_s(&datei, "locations.dat", "a");
+	/*if ((fopen_s(&datei, "locations.dat", "ab")) == NULL) {
+	fprintf(stderr, "Fehler bei der Dateioeffnung von location.dat");
+	cout << "Fehler bei der Dateioeffnung von location.dat" << endl;
+	}*/
+	fwrite(&newloc,sizeof(char),10,datei);
+	fclose(datei);
 	char antwort;
 	do {
 		cout << "Noch einmal?(j/n)" << endl;
