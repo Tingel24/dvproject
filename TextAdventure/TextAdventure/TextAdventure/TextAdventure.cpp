@@ -9,11 +9,23 @@ using namespace std;
 void intro();
 void testscreen();
 void drawscreen(char picture[]);
+void getloc(char[],int j);
+void getimg();
+void setloc();
+void setimg();
+void mainmenu();
+void startgame();
+void loadgame();
+void debug();
 
 int main()
 {
 	testscreen();
 	intro();
+	mainmenu();
+
+
+
 	char picture[] = { R"foo(   
       ,,,,
      /   '
@@ -72,6 +84,26 @@ void testscreen() {
 	system("CLS");
 }
 
+void mainmenu() {
+	system("CLS");
+	cout << R"foo(
+	[1] Start New Game
+	[2] Load Game
+	[3] Debug
+)foo" << endl;
+	char answer;
+	cin >> answer;
+	answer = atoi(&answer);
+	switch (answer) {
+		case 1:startgame();
+		break;
+		case 2:loadgame();
+		break;
+		case 3:debug();
+		break;
+	}
+}
+
 void drawscreen(char picture[]) {
 	
 	cout <<picture
@@ -88,3 +120,74 @@ void drawscreen(char picture[]) {
 )foo";
 }
 
+void getloc(char[],int j) {
+	char newloc[10];
+	FILE *datei;
+	if ((datei = fopen("locations.dat", "r")) == NULL) {
+		fprintf(stderr, "Fehler bei der Dateioeffnung von location.dat");
+	}
+	fread(&newloc, sizeof(char[10]), j, datei);
+}
+
+void startgame() {
+
+};
+
+void loadgame() {
+
+}
+
+void debug() {
+	system("CLS");
+	char answer;
+	system("cls");
+	cout << "MapEdit" << endl;
+	cout << endl;
+	cout << R"foo(
+	[1] Location
+	[2] Image
+	[3] Exit
+)foo" << endl;
+	cin >> answer;
+	answer = atoi(&answer);
+	switch (answer) {
+	case 1:setloc();
+		break;
+	case 2:setimg();
+		break;
+	case 3:mainmenu();
+		break;
+	}
+}
+
+void setloc() {
+	char newloc[10];
+	cout << "Enter new location name(not more than 10 characters):";
+	cin >> newloc;
+	FILE *datei;
+	if ((datei = fopen("locations.dat", "a")) == NULL) {
+		fprintf(stderr, "Fehler bei der Dateioeffnung von location.dat");
+	}
+	fwrite(&newloc, sizeof(char[10]), 1, datei);
+	char antwort;
+	do {
+		cout << "Noch einmal?(j/n)" << endl;
+		cin >> antwort;
+		antwort = char(toupper(antwort));
+		if (antwort == 'J') {
+			setloc();
+		}
+		if (antwort == 'N') {
+			debug();
+		}
+
+	} while ((antwort != 'J') && (antwort != 'N'));
+}
+
+void setimg() {
+
+}
+
+void getimg() {
+
+}
