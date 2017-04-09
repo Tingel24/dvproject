@@ -131,7 +131,7 @@ void getloc(char newloc[],int j) {
 		fprintf(stderr, "Fehler bei der Dateioeffnung von location.txt");
 		cout << "Fehler bei der Dateioeffnung von location.txt" << endl;
 	}
-	fread(&newloc, sizeof(char[10]),j,datei);
+	fgets(newloc,10,datei);
 	fclose(datei);
 }
 
@@ -171,11 +171,12 @@ void setloc() {
 	cout << "Enter new location name(not more than 10 characters):";
 	cin >> newloc;
 	FILE *datei;
-	if ((fopen_s(&datei, "locations.txt", "ab")) == NULL) {
+	if ((datei = fopen("locations.txt", "a")) == NULL) {
 	fprintf(stderr, "Fehler bei der Dateioeffnung von location.txt");
 	cout << "Fehler bei der Dateioeffnung von location.txt" << endl;
 	}
 	fprintf(datei,newloc);
+	fprintf(datei,"\n");
 	fclose(datei);
 	char antwort;
 	do {
