@@ -26,6 +26,7 @@ int main()
 
 	char loc[10];
 	getloc(loc, 1);
+	
 	cout << loc << endl;
 	system("Pause");
 
@@ -67,22 +68,22 @@ system("CLS");
 void testscreen() {
 	cout <<
 		R"foo(
-+-------------------------------------------------------------------------------------------------+
-|                                                                                                 |
-|                                                                                                 |
-|                                                                                                 |
-|                                                                                                 |
-|                                                                                                 |
-|                                                                                                 |
-|                       Resize to show complete box                                               |
-|                        for game to work correctly                                               |
-|                                                                                                 |
-|                                                                                                 |
-|                                                                                                 |
-|                                                                                                 |
-|                                                                                                 |
-|                                                                                                 |
-+-------------------------------------------------------------------------------------------------+
++----------------------------------------------------------------------------------+
+|                                                                                  |
+|                                                                                  |
+|                                                                                  |
+|                                                                                  |
+|                                                                                  |
+|                                                                                  |
+|                       Resize to show complete box                                |
+|                        for game to work correctly                                |
+|                                                                                  |
+|                                                                                  |
+|                                                                                  |
+|                                                                                  |
+|                                                                                  |
+|                                                                                  |
++----------------------------------------------------------------------------------+
 )foo";
 	system("PAUSE");
 	system("CLS");
@@ -126,10 +127,10 @@ void drawscreen(char picture[]) {
 
 void getloc(char newloc[],int j) {
 	FILE *datei;
-	/*if ((fopen_s(&datei, "locations.dat", "ab")) == NULL) {
-		fprintf(stderr, "Fehler bei der Dateioeffnung von location.dat");
-		cout << "Fehler bei der Dateioeffnung von location.dat" << endl;
-	}*/
+	if ((datei = fopen("locations.txt","r")) == NULL) {
+		fprintf(stderr, "Fehler bei der Dateioeffnung von location.txt");
+		cout << "Fehler bei der Dateioeffnung von location.txt" << endl;
+	}
 	fread(&newloc, sizeof(char[10]),j,datei);
 	fclose(datei);
 }
@@ -170,12 +171,11 @@ void setloc() {
 	cout << "Enter new location name(not more than 10 characters):";
 	cin >> newloc;
 	FILE *datei;
-	fopen_s(&datei, "locations.dat", "a");
-	/*if ((fopen_s(&datei, "locations.dat", "ab")) == NULL) {
-	fprintf(stderr, "Fehler bei der Dateioeffnung von location.dat");
-	cout << "Fehler bei der Dateioeffnung von location.dat" << endl;
-	}*/
-	fwrite(&newloc,sizeof(char),10,datei);
+	if ((fopen_s(&datei, "locations.txt", "ab")) == NULL) {
+	fprintf(stderr, "Fehler bei der Dateioeffnung von location.txt");
+	cout << "Fehler bei der Dateioeffnung von location.txt" << endl;
+	}
+	fprintf(datei,newloc);
 	fclose(datei);
 	char antwort;
 	do {
