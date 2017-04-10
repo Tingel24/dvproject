@@ -1,5 +1,5 @@
 ﻿  TextAdventure.cpp
-c:\users\luca\source\repos\dvproject\textadventure\textadventure\textadventure\textadventure.cpp(8): warning C4005: "_CRT_SECURE_NO_WARNINGS": Makro-Neudefinition
-  c:\users\luca\source\repos\dvproject\textadventure\textadventure\textadventure\textadventure.cpp(8): note: Befehlszeilenargumente: siehe vorherige Definition von "_CRT_SECURE_NO_WARNINGS"
+c:\users\luca\source\repos\dvproject\textadventure\textadventure\textadventure\textadventure.cpp(10): warning C4005: "_CRT_SECURE_NO_WARNINGS": Makro-Neudefinition
+  c:\users\luca\source\repos\dvproject\textadventure\textadventure\textadventure\textadventure.cpp(10): note: Befehlszeilenargumente: siehe vorherige Definition von "_CRT_SECURE_NO_WARNINGS"
   TextAdventure.vcxproj -> C:\Users\LUCA\Source\Repos\dvproject\TextAdventure\TextAdventure\x64\Debug\TextAdventure.exe
   TextAdventure.vcxproj -> C:\Users\LUCA\Source\Repos\dvproject\TextAdventure\TextAdventure\x64\Debug\TextAdventure.pdb (Partial PDB)

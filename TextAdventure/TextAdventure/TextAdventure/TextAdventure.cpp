@@ -4,6 +4,8 @@
 #include "stdafx.h"
 #include <iostream>
 #include "windows.h"
+#include "mmsystem.h"
+#pragma comment(lib, "winmm.lib")
 using namespace std;
 #define _CRT_SECURE_NO_WARNINGS
 
@@ -23,35 +25,12 @@ int main()
 {
 	testscreen();
 	intro();
-
-	char loc[10];
-	getloc(loc, 1);
-	
-	cout << loc << endl;
-	system("Pause");
-
 	mainmenu();
-//	char picture[] = { R"foo(   
-//      ,,,,
-//     /   '
-//    /.. /
-//   ( c  D
-//    \- '\_
-//     `-'\)\
-//        |_ \
-//        |U \\
-//       (__,//
-//       |. \/
-//       LL__I
-//        |||
-//        |||
-//       -``'
-//)foo" };
-//	drawscreen(picture);
     return 0;
 }
 
 void intro() {
+	PlaySound(TEXT("C:\\Users\\LUCA\\Source\\Repos\\dvproject\\TextAdventure\\Music\\Ataraxia.wav"), NULL, SND_FILENAME | SND_ASYNC);
 	cout<<
 		R"foo(
               _                 _                    _____     _                 _ 
@@ -61,29 +40,28 @@ void intro() {
   / ____ \ (_| |\ V /  __/ | | | |_| |_| | | |  __/  _| |_\__ \ | (_| | | | | (_| |
  /_/    \_\__,_| \_/ \___|_| |_|\__|\__,_|_|  \___| |_____|___/_|\__,_|_| |_|\__,_|
 )foo";
-	Sleep(3000);
+	Sleep(5000);
 system("CLS");                                                                                  																							
 }
 
 void testscreen() {
 	cout <<
 		R"foo(
-+----------------------------------------------------------------------------------+
-|                                                                                  |
-|                                                                                  |
-|                                                                                  |
-|                                                                                  |
-|                                                                                  |
-|                                                                                  |
-|                       Resize to show complete box                                |
-|                        for game to work correctly                                |
-|                                                                                  |
-|                                                                                  |
-|                                                                                  |
-|                                                                                  |
-|                                                                                  |
-|                                                                                  |
-+----------------------------------------------------------------------------------+
++---------------------------------------------------------------------------------------+
+|                                                                                       |
+|                                                                                       |
+|                                                                                       |
+|                                                                                       |
+|                                                                                       |
+|                                                                                       |
+|                       Resize to show complete box                                     |
+|                        for game to work correctly                                     |
+|                                                                                       |
+|                         Dont resize after this!                                       |
+|                                                                                       |
+|                                                                                       |
+|                                                                                       |
++---------------------------------------------------------------------------------------+
 )foo";
 	system("PAUSE");
 	system("CLS");
