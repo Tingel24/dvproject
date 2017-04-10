@@ -7,7 +7,7 @@
 #include "mmsystem.h"
 #pragma comment(lib, "winmm.lib")
 using namespace std;
-#define _CRT_SECURE_NO_WARNINGS
+
 
 
 void testscreen();
@@ -15,16 +15,16 @@ void intro();
 void mainmenu();
 void startgame();
 void loadgame();
-void debug();
 void drawscreen(int,int);
-void getloc(char[],int);
-void getimg(char[],int);
-void setloc();
-void setimg();
+void getloc(int);
+void getimg(int);
+//void setloc();
+//void setimg();
 
-char location[10];
-const int imgsize = 500;
+const int imgsize = 1500;
+const int locsize = 102;
 char image[imgsize];
+char location[locsize];
 
 int main()
 {
@@ -75,7 +75,7 @@ void intro() {
 			 | |__| | | | |   <| | | | (_) \ V  V /| | | | | |  | |  __/ | | (_) |
 			  \____/|_| |_|_|\_\_| |_|\___/ \_/\_/ |_| |_| |_|  |_|\___|_|  \___/ 
 )foo";
-	Sleep(5000);
+	Sleep(1000);
 system("CLS");                                                                                  																							
 }
 
@@ -84,7 +84,6 @@ void mainmenu() {
 	cout << R"foo(
 	[1] Start New Game
 	[2] Load Game
-	[3] Debug
 )foo" << endl;
 	char answer;
 	cin >> answer;
@@ -94,114 +93,103 @@ void mainmenu() {
 		break;
 		case 2:loadgame();
 		break;
-		case 3:debug();
-		break;
 	}
 }
 
 void startgame() {
-	drawscreen(1,1);
+	drawscreen(2,1);
 };
 
 void loadgame() {
 
 }
 
-void debug() {
-	system("CLS");
-	char answer;
-	system("cls");
-	cout << "MapEdit" << endl;
-	cout << endl;
-	cout << R"foo(
-	[1] Location
-	[2] Image
-	[3] Exit
-)foo" << endl;
-	cin >> answer;
-	answer = atoi(&answer);
-	switch (answer) {
-	case 1:setloc();
-		break;
-	case 2:setimg();
-		break;
-	case 3:mainmenu();
-		break;
-	}
-}
-
 void drawscreen(int locint,int imgint) {
-	getloc(location,locint);
-	getimg(image,imgint);
 	system("CLS");
-	cout<<image
-		<<
+	getloc(locint);
+	getimg(imgint);
+	cout<<image<<
 		R"foo(
-+-------------------------------------------------------------------------------------------------+
-|                                 )foo"<<location<<R"foo(                                                         |
-+-------------------------------------------------------------------------------------------------+
-|                                                                                                 |
-|                                                                                                 |
-|                                                                                                 |
-|                                                                                                 |
-+-------------------------------------------------------------------------------------------------+)foo";
++---------------------------------------------------------------------------------------------------+
+)foo"<<location<<R"foo(                                                                            
++---------------------------------------------------------------------------------------------------+
+
+
+
+
++---------------------------------------------------------------------------------------------------+)foo";
 	char answer;
 	cin >> answer;
 }
 
-void getloc(char newloc[],int locint) {
+void getloc( int locint) {
 	FILE *datei;
-	if ((datei = fopen("locations.txt","r")) == NULL) {
+	if ((datei = fopen("locations.txt", "r")) == NULL) {
 		fprintf(stderr, "Fehler bei der Dateioeffnung von location.txt");
 		cout << "Fehler bei der Dateioeffnung von location.txt" << endl;
 	}
-	fgets(newloc,10,datei);
+	//locint--;
+	//fseek(datei, locsize*locint, SEEK_SET);
+	for (int i = 0;i < locint;i++) {
+		memset(&location[0], 0, locsize);
+		fgets(location, locsize, datei);
+		int l = locsize;
+		if (location[l] == '\n') {
+			location[l] = '\0';
+		}
+	}
 	fclose(datei);
 }
 
-void getimg(char image[], int imgint) {
+void getimg(int imgint) {
 	FILE *datei;
 	if ((datei = fopen("images.txt", "r")) == NULL) {
 		fprintf(stderr, "Fehler bei der Dateioeffnung von images.txt");
 		cout << "Fehler bei der Dateioeffnung von images.txt" << endl;
 	}
-	int i = 0;
-	fseek(datei, imgsize*imgint, SEEK_SET);
-	while (fgets(image, imgsize, datei) != "\n") {
-		image[i] = fgetc(datei);
-		i++;
+	/*imgint--;
+	fseek(datei, imgsize*imgint, SEEK_SET);*/
+	char newimg[imgsize];
+	for (int i = 0;i < imgint;i++) {
+		memset(&image[0], 0, sizeof(image));
+		while (fgets(newimg, imgsize, datei) != NULL) {
+			if (newimg[0] == 'e'&&newimg[1] == 'n'&&newimg[2] == 'd') {
+				break;
+			}
+			strncat(image, newimg, imgsize - strlen(image) - 1); //-1 for null-termination
+		}
 	}
 	fclose(datei);
 }
 
-void setloc() {
-	char newloc[10];
-	cout << "Enter new location name(not more than 10 characters):";
-	cin >> newloc;
-	FILE *datei;
-	if ((datei = fopen("locations.txt", "a")) == NULL) {
-	fprintf(stderr, "Fehler bei der Dateioeffnung von location.txt");
-	cout << "Fehler bei der Dateioeffnung von location.txt" << endl;
-	}
-	fprintf(datei,newloc);
-	fprintf(datei,"\n");
-	fclose(datei);
-	char antwort;
-	do {
-		cout << "Noch einmal?(j/n)" << endl;
-		cin >> antwort;
-		antwort = char(toupper(antwort));
-		if (antwort == 'J') {
-			setloc();
-		}
-		if (antwort == 'N') {
-			debug();
-		}
-
-	} while ((antwort != 'J') && (antwort != 'N'));
-}
-
-void setimg() {
-
-}
+//void setloc() {
+//	char newloc[10];
+//	cout << "Enter new location name(not more than 10 characters):";
+//	cin >> newloc;
+//	FILE *datei;
+//	if ((datei = fopen("locations.txt", "a")) == NULL) {
+//	fprintf(stderr, "Fehler bei der Dateioeffnung von location.txt");
+//	cout << "Fehler bei der Dateioeffnung von location.txt" << endl;
+//	}
+//	fprintf(datei,newloc);
+//	fprintf(datei,"\n");
+//	fclose(datei);
+//	char antwort;
+//	do {
+//		cout << "Noch einmal?(j/n)" << endl;
+//		cin >> antwort;
+//		antwort = char(toupper(antwort));
+//		if (antwort == 'J') {
+//			setloc();
+//		}
+//		if (antwort == 'N') {
+//			debug();
+//		}
+//
+//	} while ((antwort != 'J') && (antwort != 'N'));
+//}
+//
+//void setimg() {
+//
+//}
 
