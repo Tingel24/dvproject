@@ -9,17 +9,22 @@
 using namespace std;
 #define _CRT_SECURE_NO_WARNINGS
 
-void intro();
+
 void testscreen();
-void drawscreen(char picture[]);
-void getloc(char[],int j);
-void getimg();
-void setloc();
-void setimg();
+void intro();
 void mainmenu();
 void startgame();
 void loadgame();
 void debug();
+void drawscreen(int,int);
+void getloc(char[],int);
+void getimg(char[],int);
+void setloc();
+void setimg();
+
+char location[10];
+const int imgsize = 500;
+char image[imgsize];
 
 int main()
 {
@@ -29,42 +34,49 @@ int main()
     return 0;
 }
 
+void testscreen() {
+	cout <<
+		R"foo(
++-------------------------------------------------------------------------------------------------+
+|                                                                                                 |
+|                                                                                                 |
+|                                                                                                 |
+|                                                                                                 |
+|                                                                                                 |
+|                                                                                                 |
+|                       Resize to show complete box                                               |
+|                        for game to work correctly                                               |
+|                                                                                                 |
+|                         Dont resize after this!                                                 |
+|                                                                                                 |
+|                                                                                                 |
+|                                                                                                 |
+|                                                                                                 |
+|                                                                                                 |
+|                                                                                                 |
+|                                                                                                 |
+|                                                                                                 |
+|                                                                                                 |
+|                                                                                                 |
+|                                                                                                 |
++-------------------------------------------------------------------------------------------------+
+)foo";
+	system("PAUSE");
+	system("CLS");
+}
+
 void intro() {
 	PlaySound(TEXT("C:\\Users\\LUCA\\Source\\Repos\\dvproject\\TextAdventure\\Music\\Ataraxia.wav"), NULL, SND_FILENAME | SND_ASYNC);
 	cout<<
 		R"foo(
-              _                 _                    _____     _                 _ 
-     /\      | |               | |                  |_   _|   | |               | |
-    /  \   __| |_   _____ _ __ | |_ _   _ _ __ ___    | |  ___| | __ _ _ __   __| |
-   / /\ \ / _` \ \ / / _ \ '_ \| __| | | | '__/ _ \   | | / __| |/ _` | '_ \ / _` |
-  / ____ \ (_| |\ V /  __/ | | | |_| |_| | | |  __/  _| |_\__ \ | (_| | | | | (_| |
- /_/    \_\__,_| \_/ \___|_| |_|\__|\__,_|_|  \___| |_____|___/_|\__,_|_| |_|\__,_|
+			 | |  | |     | |                              | |  | |               
+			 | |  | |_ __ | | ___ __   _____      ___ __   | |__| | ___ _ __ ___  
+			 | |  | | '_ \| |/ / '_ \ / _ \ \ /\ / / '_ \  |  __  |/ _ \ '__/ _ \ 
+			 | |__| | | | |   <| | | | (_) \ V  V /| | | | | |  | |  __/ | | (_) |
+			  \____/|_| |_|_|\_\_| |_|\___/ \_/\_/ |_| |_| |_|  |_|\___|_|  \___/ 
 )foo";
 	Sleep(5000);
 system("CLS");                                                                                  																							
-}
-
-void testscreen() {
-	cout <<
-		R"foo(
-+---------------------------------------------------------------------------------------+
-|                                                                                       |
-|                                                                                       |
-|                                                                                       |
-|                                                                                       |
-|                                                                                       |
-|                                                                                       |
-|                       Resize to show complete box                                     |
-|                        for game to work correctly                                     |
-|                                                                                       |
-|                         Dont resize after this!                                       |
-|                                                                                       |
-|                                                                                       |
-|                                                                                       |
-+---------------------------------------------------------------------------------------+
-)foo";
-	system("PAUSE");
-	system("CLS");
 }
 
 void mainmenu() {
@@ -87,34 +99,8 @@ void mainmenu() {
 	}
 }
 
-void drawscreen(char picture[]) {
-	
-	cout <<picture
-		 <<
-		R"foo(
-+-------------------------------------------------------------------------------------------------+
-|                                                                                                 |
-+-------------------------------------------------------------------------------------------------+
-|                                                                                                 |
-|                                                                                                 |
-|                                                                                                 |
-|                                                                                                 |
-+-------------------------------------------------------------------------------------------------+
-)foo";
-}
-
-void getloc(char newloc[],int j) {
-	FILE *datei;
-	if ((datei = fopen("locations.txt","r")) == NULL) {
-		fprintf(stderr, "Fehler bei der Dateioeffnung von location.txt");
-		cout << "Fehler bei der Dateioeffnung von location.txt" << endl;
-	}
-	fgets(newloc,10,datei);
-	fclose(datei);
-}
-
 void startgame() {
-
+	drawscreen(1,1);
 };
 
 void loadgame() {
@@ -142,6 +128,50 @@ void debug() {
 	case 3:mainmenu();
 		break;
 	}
+}
+
+void drawscreen(int locint,int imgint) {
+	getloc(location,locint);
+	getimg(image,imgint);
+	system("CLS");
+	cout<<image
+		<<
+		R"foo(
++-------------------------------------------------------------------------------------------------+
+|                                 )foo"<<location<<R"foo(                                                         |
++-------------------------------------------------------------------------------------------------+
+|                                                                                                 |
+|                                                                                                 |
+|                                                                                                 |
+|                                                                                                 |
++-------------------------------------------------------------------------------------------------+)foo";
+	char answer;
+	cin >> answer;
+}
+
+void getloc(char newloc[],int locint) {
+	FILE *datei;
+	if ((datei = fopen("locations.txt","r")) == NULL) {
+		fprintf(stderr, "Fehler bei der Dateioeffnung von location.txt");
+		cout << "Fehler bei der Dateioeffnung von location.txt" << endl;
+	}
+	fgets(newloc,10,datei);
+	fclose(datei);
+}
+
+void getimg(char image[], int imgint) {
+	FILE *datei;
+	if ((datei = fopen("images.txt", "r")) == NULL) {
+		fprintf(stderr, "Fehler bei der Dateioeffnung von images.txt");
+		cout << "Fehler bei der Dateioeffnung von images.txt" << endl;
+	}
+	int i = 0;
+	fseek(datei, imgsize*imgint, SEEK_SET);
+	while (fgets(image, imgsize, datei) != "\n") {
+		image[i] = fgetc(datei);
+		i++;
+	}
+	fclose(datei);
 }
 
 void setloc() {
@@ -175,6 +205,3 @@ void setimg() {
 
 }
 
-void getimg() {
-
-}
