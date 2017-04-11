@@ -22,7 +22,7 @@ void getimg(int);
 //void setimg();
 
 const int imgsize = 1500;
-const int locsize = 102;
+const int locsize = 10;
 char image[imgsize];
 char location[locsize];
 
@@ -66,7 +66,7 @@ void testscreen() {
 }
 
 void intro() {
-	PlaySound(TEXT("..\\Music\\Ataraxia.wav"), NULL, SND_FILENAME | SND_ASYNC);
+	PlaySound(TEXT("..\\Music\\Visager\\TitleTheme.wav"), NULL, SND_FILENAME | SND_ASYNC);
 	cout<<
 		R"foo(
 			 | |  | |     | |                              | |  | |               
@@ -111,7 +111,7 @@ void drawscreen(int locint,int imgint) {
 	cout<<image<<
 		R"foo(
 +---------------------------------------------------------------------------------------------------+
-)foo"<<location<<R"foo(                                                                            
+                                 )foo"<<location<<R"foo(                                                                            
 +---------------------------------------------------------------------------------------------------+
 
 
@@ -133,9 +133,10 @@ void getloc( int locint) {
 	for (int i = 0;i < locint;i++) {
 		memset(&location[0], 0, locsize);
 		fgets(location, locsize, datei);
-		int l = locsize;
-		if (location[l] == '\n') {
-			location[l] = '\0';
+		for (int i = 0;i < 10;i++) {
+			if (location[i] == '\n') {
+				location[i] = '\0';
+			}
 		}
 	}
 	fclose(datei);
