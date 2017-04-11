@@ -66,7 +66,7 @@ void testscreen() {
 }
 
 void intro() {
-	PlaySound(TEXT("C:\\Users\\LUCA\\Source\\Repos\\dvproject\\TextAdventure\\Music\\Ataraxia.wav"), NULL, SND_FILENAME | SND_ASYNC);
+	PlaySound(TEXT("..\\Music\\Ataraxia.wav"), NULL, SND_FILENAME | SND_ASYNC);
 	cout<<
 		R"foo(
 			 | |  | |     | |                              | |  | |               
