@@ -1,0 +1,323 @@
+void click() {
+	//https://www.youtube.com/watch?v=V83Ja4FmrqE
+	FILE *datei;
+	if ((datei = fopen("..\\Music\\click.wav", "rb")) == NULL) {
+		fprintf(stderr, "Fehler bei der Dateioeffnung von text.txt");
+		cout << "Fehler bei der Dateioeffnung von text.txt" << endl;
+	}
+	bool looping = false;
+
+	char type[4];
+	DWORD size, chunksize;
+	short formattype, channels;
+	DWORD samplerate, avgbytespersec;
+	short bytespersample, bitspersample;
+	DWORD datasize;
+
+	fread(type, sizeof(char), 4, datei);
+	if (type[0] != 'R' || type[1] != 'I' || type[2] != 'F' || type[3] != 'F') {
+		fprintf(stderr, "Fehler bei der Musikwiedergabe");
+		cout << "Fehler bei der Musikwiedergabe" << endl;
+	}
+
+	fread(&size, sizeof(DWORD), 1, datei);
+	fread(type, sizeof(char), 4, datei);
+	if (type[0] != 'W' || type[1] != 'A' || type[2] != 'V' || type[3] != 'E') {
+		fprintf(stderr, "Fehler bei der Musikwiedergabe");
+		cout << "Fehler bei der Musikwiedergabe" << endl;
+	}
+
+	fread(type, sizeof(char), 4, datei);
+	if (type[0] != 'f' || type[1] != 'm' || type[2] != 't' || type[3] != ' ') {
+		fprintf(stderr, "Fehler bei der Musikwiedergabe");
+		cout << "Fehler bei der Musikwiedergabe" << endl;
+	}
+
+	fread(&chunksize, sizeof(DWORD), 1, datei);
+	fread(&formattype, sizeof(short), 1, datei);
+	fread(&channels, sizeof(short), 1, datei);
+	fread(&samplerate, sizeof(DWORD), 1, datei);
+	fread(&avgbytespersec, sizeof(DWORD), 1, datei);
+	fread(&bytespersample, sizeof(short), 1, datei);
+	fread(&bitspersample, sizeof(short), 1, datei);
+
+	fread(type, sizeof(char), 4, datei);
+	if (type[0] != 'd' || type[1] != 'a' || type[2] != 't' || type[3] != 'a') {
+		fprintf(stderr, "Fehler bei der Musikwiedergabe");
+		cout << "Fehler bei der Musikwiedergabe" << endl;
+	}
+
+	fread(&datasize, sizeof(DWORD), 1, datei);
+
+	unsigned char* buff = new unsigned char[datasize];
+	fread(buff, sizeof(BYTE), datasize, datei);
+
+	ALCdevice *device;
+	ALCcontext *context;
+
+	device = alcOpenDevice(NULL);
+	if (!device) {
+		fprintf(stderr, "Fehler bei der Wiedergabegeräteöffnung");
+		cout << "Fehler bei der Wiedergabegeräteöffnung" << endl;
+	}
+	context = alcCreateContext(device, NULL);
+	alcMakeContextCurrent(context);
+	if (!context) {
+		fprintf(stderr, "Fehler bei der Soundcontextöffnung");
+		cout << "Fehler bei der Soundcontextöffnung" << endl;
+	}
+
+	
+	ALuint buffer;
+	ALuint frequency = samplerate;
+	ALenum format = 0;
+	alGenBuffers(1, &buffer);
+	alGenSources(1, &clicksource);
+
+	switch (bitspersample) {
+	case 8: {
+		switch (channels) {
+		case 1: {
+			format = AL_FORMAT_MONO8;
+		}
+				break;
+		case 2: {
+			format = AL_FORMAT_STEREO8;
+		}
+		}
+	}
+	case 16: {
+		switch (channels) {
+		case 1: {
+			format = AL_FORMAT_MONO16;
+		}
+				break;
+		case 2: {
+			format = AL_FORMAT_STEREO16;
+		}
+		}
+	}
+	}
+
+	alBufferData(buffer, format, buff, datasize, frequency);
+
+	ALfloat SourcePos[] = { 0.0,0.0,0.0 };
+	ALfloat SourceVel[] = { 0.0,0.0,0.0 };
+	ALfloat ListenerPos[] = { 0.0,0.0,0.0 };
+	ALfloat ListenerVel[] = { 0.0,0.0,0.0 };
+	ALfloat ListenerOri[] = { 0.0,0.0,-1.0,0.0,1.0,0.0 };
+
+	alListenerfv(AL_POSITION, ListenerPos);
+	alListenerfv(AL_POSITION, ListenerVel);
+	alListenerfv(AL_POSITION, ListenerOri);
+
+	alSourcei(clicksource, AL_BUFFER, buffer);
+	alSourcef(clicksource, AL_PITCH, 1.0f);
+	alSourcef(clicksource, AL_GAIN, 1.0f);
+	alSourcefv(clicksource, AL_POSITION, SourcePos);
+	alSourcefv(clicksource, AL_VELOCITY, SourceVel);
+	alSourcei(clicksource, AL_LOOPING, looping);
+
+
+	/*fclose(datei);
+	delete[] buff;
+	alDeleteSources(1, &source);
+	alDeleteBuffers(1, &buffer);
+	alcMakeContextCurrent(NULL);
+	alcDestroyContext(context);
+	alcCloseDevice(device);*/
+}
+
+void music(char pfad[],bool looping) {
+	https://www.youtube.com/watch?v=V83Ja4FmrqE
+
+
+	const int numbuffers = 3;
+	const int numsources = 3;
+	ALuint buffer[numbuffers];
+	ALuint source[numsources];
+
+	alGenBuffers(numbuffers, buffer);
+	alGenSources(numsources, source);
+
+	FILE *datei;
+	if ((datei = fopen("..\\Music\\click.wav", "rb")) == NULL) {
+		fprintf(stderr, "Fehler bei der Dateioeffnung von text.txt");
+		cout << "Fehler bei der Dateioeffnung von text.txt" << endl;
+	}
+	char type[4];
+	DWORD size, chunksize;
+	short formattype, channels;
+	DWORD samplerate, avgbytespersec;
+	short bytespersample, bitspersample;
+	DWORD datasize;
+
+	fread(type, sizeof(char), 4, datei);
+	if (type[0] != 'R' || type[1] != 'I' || type[2] != 'F' || type[3] != 'F') {
+		fprintf(stderr, "Fehler bei der Musikwiedergabe");
+		cout << "Fehler bei der Musikwiedergabe" << endl;
+	}
+
+	fread(&size, sizeof(DWORD), 1, datei);
+	fread(type, sizeof(char), 4, datei);
+	if (type[0] != 'W' || type[1] != 'A' || type[2] != 'V' || type[3] != 'E') {
+		fprintf(stderr, "Fehler bei der Musikwiedergabe");
+		cout << "Fehler bei der Musikwiedergabe" << endl;
+	}
+
+	fread(type, sizeof(char), 4, datei);
+	if (type[0] != 'f' || type[1] != 'm' || type[2] != 't' || type[3] != ' ') {
+		fprintf(stderr, "Fehler bei der Musikwiedergabe");
+		cout << "Fehler bei der Musikwiedergabe" << endl;
+	}
+
+	fread(&chunksize, sizeof(DWORD), 1, datei);
+	fread(&formattype, sizeof(short), 1, datei);
+	fread(&channels, sizeof(short), 1, datei);
+	fread(&samplerate, sizeof(DWORD), 1, datei);
+	fread(&avgbytespersec, sizeof(DWORD), 1, datei);
+	fread(&bytespersample, sizeof(short), 1, datei);
+	fread(&bitspersample, sizeof(short), 1, datei);
+
+	fread(type, sizeof(char), 4, datei);
+	if (type[0] != 'd' || type[1] != 'a' || type[2] != 't' || type[3] != 'a') {
+		fprintf(stderr, "Fehler bei der Musikwiedergabe");
+		cout << "Fehler bei der Musikwiedergabe" << endl;
+	}
+
+	fread(&datasize, sizeof(DWORD), 1, datei);
+
+	unsigned char* buff = new unsigned char[datasize];
+	fread(buff, sizeof(BYTE), datasize, datei);
+
+	ALCdevice *device;
+	ALCcontext *context;
+
+	device = alcOpenDevice(NULL);
+	if (!device) {
+		fprintf(stderr, "Fehler bei der Wiedergabegeräteöffnung");
+		cout << "Fehler bei der Wiedergabegeräteöffnung" << endl;
+	}
+	context = alcCreateContext(device, NULL);
+	alcMakeContextCurrent(context);
+	if (!context) {
+		fprintf(stderr, "Fehler bei der Soundcontextöffnung");
+		cout << "Fehler bei der Soundcontextöffnung" << endl;
+	}
+
+
+	ALuint buffer;
+	ALuint frequency = samplerate;
+	ALenum format = 0;
+	alGenBuffers(1, &buffer[0]);
+	alGenSources(1, &source[0]);
+
+	switch (bitspersample) {
+	case 8: {
+		switch (channels) {
+		case 1: {
+			format = AL_FORMAT_MONO8;
+		}
+				break;
+		case 2: {
+			format = AL_FORMAT_STEREO8;
+		}
+		}
+	}
+	case 16: {
+		switch (channels) {
+		case 1: {
+			format = AL_FORMAT_MONO16;
+		}
+				break;
+		case 2: {
+			format = AL_FORMAT_STEREO16;
+		}
+		}
+	}
+	}
+
+	alBufferData(buffer[0], format, buff, datasize, frequency);
+
+	ALfloat SourcePos[] = { 0.0,0.0,0.0 };
+	ALfloat SourceVel[] = { 0.0,0.0,0.0 };
+	ALfloat ListenerPos[] = { 0.0,0.0,0.0 };
+	ALfloat ListenerVel[] = { 0.0,0.0,0.0 };
+	ALfloat ListenerOri[] = { 0.0,0.0,-1.0,0.0,1.0,0.0 };
+
+	alListenerfv(AL_POSITION, ListenerPos);
+	alListenerfv(AL_POSITION, ListenerVel);
+	alListenerfv(AL_POSITION, ListenerOri);
+
+	alSourcei(source[0], AL_BUFFER, buffer[0]);
+	alSourcef(source[0], AL_PITCH, 1.0f);
+	alSourcef(source[0], AL_GAIN, 0.8f);
+	alSourcefv(source[0], AL_POSITION, SourcePos);
+	alSourcefv(source[0], AL_VELOCITY, SourceVel);
+	alSourcei(source[0], AL_LOOPING, FALSE);
+
+
+	/*fclose(datei);
+	delete[] buff;
+	alDeleteSources(1, &source);
+	alDeleteBuffers(1, &buffer);
+	alcMakeContextCurrent(NULL);
+	alcDestroyContext(context);
+	alcCloseDevice(device);*/
+}
+
+ALboolean LoadALData() {
+
+
+	/*ALenum format;
+	ALsizei size;
+	ALvoid* data;
+	ALsizei freq;
+	ALboolean loop;*/
+
+	alGenBuffers(NUM_BUFFERS, Buffers);
+
+	if(alGetError() != AL_NO_ERROR) {
+		return AL_FALSE;
+	}
+
+	alutCreateBufferFromFile("..\\Music\\Visager\\TitleTheme.wav");
+
+	alutCreateBufferFromFile("..\\Music\\Ataraxia.wav");
+
+	alutCreateBufferFromFile("..\\Music\\click.wav");
+
+	alGenSources(NUM_SOURCES, Sources);
+	if (alGetError() != AL_NO_ERROR) {
+		return AL_FALSE;
+	}
+
+	alSourcei(Sources[0], AL_BUFFER, Buffers[0]);
+	alSourcef(Sources[0], AL_PITCH, 1.0);
+	alSourcef(Sources[0], AL_GAIN, 1.0);
+	alSourcefv(Sources[0], AL_POSITION, SourcesPos[0]);
+	alSourcefv(Sources[0], AL_VELOCITY, SourcesVel[0]);
+	alSourcei(Sources[0], AL_LOOPING, AL_TRUE);
+
+	alSourcei(Sources[1], AL_BUFFER, Buffers[1]);
+	alSourcef(Sources[1], AL_PITCH, 1.0);
+	alSourcef(Sources[1], AL_GAIN, 1.0);
+	alSourcefv(Sources[1], AL_POSITION, SourcesPos[1]);
+	alSourcefv(Sources[1], AL_VELOCITY, SourcesVel[1]);
+	alSourcei(Sources[1], AL_LOOPING, AL_FALSE);
+
+	alSourcei(Sources[2], AL_BUFFER, Buffers[2]);
+	alSourcef(Sources[2], AL_PITCH, 1.0);
+	alSourcef(Sources[2], AL_GAIN, 1.0);
+	alSourcefv(Sources[2], AL_POSITION, SourcesPos[2]);
+	alSourcefv(Sources[2], AL_VELOCITY, SourcesVel[2]);
+	alSourcei(Sources[2], AL_LOOPING, AL_FALSE);
+
+	if (alGetError() != AL_NO_ERROR) {
+		return AL_FALSE;
+	}
+	else {
+		return AL_TRUE;
+	}
+	
+}

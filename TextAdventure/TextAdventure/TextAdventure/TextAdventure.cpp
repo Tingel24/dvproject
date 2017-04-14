@@ -6,7 +6,6 @@
 #include "windows.h"
 #include "mmsystem.h"
 #pragma comment(lib, "winmm.lib")
-
 using namespace std;
 
 
@@ -21,7 +20,6 @@ void getloc(int);
 void getimg(int);
 void gettxt(int);
 void room(int);
-void click();
 
 
 const int imgsize = 2500;
@@ -34,14 +32,14 @@ char text[txtsize];
 int main()
 {
 	testscreen();
-	intro();
+	intro();	
 	mainmenu();
     return 0;
 }
 
 void testscreen() {
 	cout <<
-
+R"foo(
 +---------------------------------------------------------------------------------------------------------------+
 |                                                                                                               |
 |                                     Resize to show complete box                                               |
@@ -119,7 +117,6 @@ void startgame() {
 			n--;
 		}
 		room(n);
-		click();
 	}
 }
 
@@ -203,9 +200,5 @@ void gettxt(int txtint) {
 
 void room(int n) {
 	drawscreen(n,n,n);
-}
-
-void click() {
-	PlaySound(TEXT("..\\Music\\click.wav"), NULL, SND_FILENAME | SND_ASYNC);
 }
 
