@@ -1,3 +1,2 @@
 ﻿  TextAdventure.cpp
-  TextAdventure.vcxproj -> C:\Users\LUCA\Source\Repos\dvproject\TextAdventure\TextAdventure\x64\Debug\TextAdventure.exe
-  TextAdventure.vcxproj -> C:\Users\LUCA\Source\Repos\dvproject\TextAdventure\TextAdventure\x64\Debug\TextAdventure.pdb (Partial PDB)
+LINK : fatal error LNK1104: Datei "libiconv.lib" kann nicht ge÷ffnet werden.

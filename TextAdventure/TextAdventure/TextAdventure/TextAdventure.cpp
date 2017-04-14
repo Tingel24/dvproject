@@ -6,6 +6,7 @@
 #include "windows.h"
 #include "mmsystem.h"
 #pragma comment(lib, "winmm.lib")
+
 using namespace std;
 
 
@@ -15,16 +16,20 @@ void intro();
 void mainmenu();
 void startgame();
 void loadgame();
-void drawscreen(int,int);
+void drawscreen(int,int,int);
 void getloc(int);
 void getimg(int);
-//void setloc();
-//void setimg();
+void gettxt(int);
+void room(int);
+void click();
 
-const int imgsize = 1500;
+
+const int imgsize = 2500;
 const int locsize = 10;
+const int txtsize = 1000;
 char image[imgsize];
 char location[locsize];
+char text[txtsize];
 
 int main()
 {
@@ -36,30 +41,35 @@ int main()
 
 void testscreen() {
 	cout <<
-		R"foo(
-+-------------------------------------------------------------------------------------------------+
-|                                                                                                 |
-|                                                                                                 |
-|                                                                                                 |
-|                                                                                                 |
-|                                                                                                 |
-|                                                                                                 |
-|                       Resize to show complete box                                               |
-|                        for game to work correctly                                               |
-|                                                                                                 |
-|                         Dont resize after this!                                                 |
-|                                                                                                 |
-|                                                                                                 |
-|                                                                                                 |
-|                                                                                                 |
-|                                                                                                 |
-|                                                                                                 |
-|                                                                                                 |
-|                                                                                                 |
-|                                                                                                 |
-|                                                                                                 |
-|                                                                                                 |
-+-------------------------------------------------------------------------------------------------+
+
++---------------------------------------------------------------------------------------------------------------+
+|                                                                                                               |
+|                                     Resize to show complete box                                               |
+|                                      for game to work correctly                                               |
+|                                                                                                               |
+|                                       Dont resize after this!                                                 |
+|                                                                                                               |
+|                                                                                                               |
+|                                                                                                               |
+|                                                                                                               |
+|                                                                                                               |
+|                                                                                                               |
+|                                                                                                               |
+|                                                                                                               |
+|                                                                                                               |
+|                                                                                                               |
+|                                                                                                               |
+|                                                                                                               |
+|                                                                                                               |
+|                                                                                                               |
+|                                                                                                               |
+|                                                                                                               |
+|                                                                                                               |
+|                                                                                                               |
+|                                                                                                               |
+|                                                                                                               |
+|                                                                                                               |
++---------------------------------------------------------------------------------------------------------------+
 )foo";
 	system("PAUSE");
 	system("CLS");
@@ -97,29 +107,42 @@ void mainmenu() {
 }
 
 void startgame() {
-	drawscreen(2,1);
-};
+	room(1);
+	char answer;
+	int n=1;
+	while (true) {
+		cin >> answer;
+		if (answer == '1') {
+			n++;
+		}
+		if (answer == '2') {
+			n--;
+		}
+		room(n);
+		click();
+	}
+}
 
 void loadgame() {
 
 }
 
-void drawscreen(int locint,int imgint) {
+void drawscreen(int locint,int imgint,int txtint) {
 	system("CLS");
 	getloc(locint);
 	getimg(imgint);
+	gettxt(txtint);
 	cout<<image<<
 		R"foo(
 +---------------------------------------------------------------------------------------------------+
                                  )foo"<<location<<R"foo(                                                                            
 +---------------------------------------------------------------------------------------------------+
+)foo" << text << R"foo(
 
 
 
-
-+---------------------------------------------------------------------------------------------------+)foo";
-	char answer;
-	cin >> answer;
++---------------------------------------------------------------------------------------------------+)foo"<<endl;
+	
 }
 
 void getloc( int locint) {
@@ -128,8 +151,6 @@ void getloc( int locint) {
 		fprintf(stderr, "Fehler bei der Dateioeffnung von location.txt");
 		cout << "Fehler bei der Dateioeffnung von location.txt" << endl;
 	}
-	//locint--;
-	//fseek(datei, locsize*locint, SEEK_SET);
 	for (int i = 0;i < locint;i++) {
 		memset(&location[0], 0, locsize);
 		fgets(location, locsize, datei);
@@ -148,8 +169,6 @@ void getimg(int imgint) {
 		fprintf(stderr, "Fehler bei der Dateioeffnung von images.txt");
 		cout << "Fehler bei der Dateioeffnung von images.txt" << endl;
 	}
-	/*imgint--;
-	fseek(datei, imgsize*imgint, SEEK_SET);*/
 	char newimg[imgsize];
 	for (int i = 0;i < imgint;i++) {
 		memset(&image[0], 0, sizeof(image));
@@ -157,40 +176,36 @@ void getimg(int imgint) {
 			if (newimg[0] == 'e'&&newimg[1] == 'n'&&newimg[2] == 'd') {
 				break;
 			}
-			strncat(image, newimg, imgsize - strlen(image) - 1); //-1 for null-termination
+			strncat(image, newimg, imgsize - strlen(image) - 1); 
 		}
 	}
 	fclose(datei);
 }
 
-//void setloc() {
-//	char newloc[10];
-//	cout << "Enter new location name(not more than 10 characters):";
-//	cin >> newloc;
-//	FILE *datei;
-//	if ((datei = fopen("locations.txt", "a")) == NULL) {
-//	fprintf(stderr, "Fehler bei der Dateioeffnung von location.txt");
-//	cout << "Fehler bei der Dateioeffnung von location.txt" << endl;
-//	}
-//	fprintf(datei,newloc);
-//	fprintf(datei,"\n");
-//	fclose(datei);
-//	char antwort;
-//	do {
-//		cout << "Noch einmal?(j/n)" << endl;
-//		cin >> antwort;
-//		antwort = char(toupper(antwort));
-//		if (antwort == 'J') {
-//			setloc();
-//		}
-//		if (antwort == 'N') {
-//			debug();
-//		}
-//
-//	} while ((antwort != 'J') && (antwort != 'N'));
-//}
-//
-//void setimg() {
-//
-//}
+void gettxt(int txtint) {
+	FILE *datei;
+	if ((datei = fopen("text.txt", "r")) == NULL) {
+		fprintf(stderr, "Fehler bei der Dateioeffnung von text.txt");
+		cout << "Fehler bei der Dateioeffnung von text.txt" << endl;
+	}
+	char newtxt[txtsize];
+	for (int i = 0;i < txtint;i++) {
+		memset(&text[0], 0, sizeof(text));
+		while (fgets(newtxt, txtsize, datei) != NULL) {
+			if (newtxt[0] == 'e'&&newtxt[1] == 'n'&&newtxt[2] == 'd') {
+				break;
+			}
+			strncat(text, newtxt, txtsize - strlen(text) - 1);
+		}
+	}
+	fclose(datei);
+}
+
+void room(int n) {
+	drawscreen(n,n,n);
+}
+
+void click() {
+	PlaySound(TEXT("..\\Music\\click.wav"), NULL, SND_FILENAME | SND_ASYNC);
+}
 
