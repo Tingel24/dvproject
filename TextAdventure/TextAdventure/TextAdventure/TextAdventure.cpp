@@ -4,6 +4,8 @@
 #include "stdafx.h"
 #include <iostream>
 #include "windows.h"
+#include "string.h"
+#include <sstream>
 #include "mmsystem.h"
 #include "SDL.h"
 #include "SDL_mixer.h"
@@ -16,15 +18,19 @@ void intro();
 void mainmenu();
 void startgame();
 void loadgame();
-void drawscreen(int,int,int);
+void drawscreen(int, int, int, char[]);
 void getloc(int);
 void getimg(int);
 void gettxt(int);
 void room(int);
 void init();
 
+struct savegame {
+	int room;
+	int delay;
+};
 
-int delay = 100;
+int delay = 50;
 const int imgsize = 2500;
 const int locsize = 10;
 const int txtsize = 1000;
@@ -42,9 +48,9 @@ int main(int argc, char *argv[])
 {
 	testscreen();
 	init();
-	intro();	
+	intro();
 	mainmenu();
-    return 0;
+	return 0;
 }
 
 void init() {
@@ -67,7 +73,7 @@ void init() {
 }
 void testscreen() {
 	cout <<
-R"foo(
+		R"foo(
 +---------------------------------------------------------------------------------------------------------------+
 |                                                                                                               |
 |                                     Resize to show complete box                                               |
@@ -106,7 +112,7 @@ void intro() {
 	Mix_Music *music = Mix_LoadMUS(titletheme);
 	Mix_PlayMusic(music, -1);
 
-	for (int i = 0;i < 4;i++) {
+	for (int i = 0; i < 4; i++) {
 		cout <<
 			R"foo(
 | |  | |     | |                              | |  | |               
@@ -190,28 +196,37 @@ void mainmenu() {
 	cin >> answer;
 	answer = atoi(&answer);
 	switch (answer) {
-		case 1:startgame();
+	case 1:startgame();
 		break;
-		case 2:loadgame();
+	case 2:loadgame();
 		break;
 	}
 }
 
 void startgame() {
-	room(1);
-	char answer;
-	int n=1;
+	drawscreen(1, 1, 1, "");
+	string answer;
+	int n = 1;
 	while (true) {
-		cin >> answer;
+		getline(cin, answer);
 		Mix_Chunk *click = Mix_LoadWAV(keyclick);
 		Mix_PlayChannel(-1, click, 0);
-		if (answer == '1') {
-			n++;
+
+		if (answer == "geh" || answer == "gehe" || answer == "go" || answer == "lauf") {
+			drawscreen(n, n, n, "Wohin willst du gehen?");
+			memset(&answer[0], 0, 10);
+			cin >> answer;
+			if (answer == "geradeaus" || answer == "Norden" || answer == "Nord" || answer == "gerade" || answer == "Tür" || answer == "Door" || answer == "front") {
+				n++;
+				drawscreen(n, n, n, "");
+				
+			}
 		}
-		if (answer == '2') {
-			n--;
+		else {
+			if (answer.length() != 0) {
+				cout << "Begriff: " << answer << " nicht verstanden" << endl;
+			}
 		}
-		room(n);
 	}
 
 }
@@ -220,7 +235,7 @@ void loadgame() {
 
 }
 
-void drawscreen(int locint,int imgint,int txtint) {
+void drawscreen(int locint, int imgint, int txtint, char info[]) {
 	system("CLS");
 	getloc(locint);
 	getimg(imgint);
@@ -230,24 +245,25 @@ void drawscreen(int locint,int imgint,int txtint) {
 +---------------------------------------------------------------------------------------------------+
                                  )foo" << location << R"foo(                                                                            
 +---------------------------------------------------------------------------------------------------+
-)foo"; for (int i = 0;text[i]!=NULL;i++) { cout << text[i];Sleep(delay); } cout << R"foo(
+)foo"; for (int i = 0; text[i] != NULL; i++) { cout << text[i]; Sleep(delay); }
+	for (int i = 0; info[i] != NULL; i++) { cout << info[i]; Sleep(delay); } cout << R"foo(
 
 
 
-+---------------------------------------------------------------------------------------------------+)foo"<<endl;
-	
++---------------------------------------------------------------------------------------------------+)foo" << endl;
+
 }
 
-void getloc( int locint) {
+void getloc(int locint) {
 	FILE *datei;
 	if ((datei = fopen("locations.txt", "r")) == NULL) {
 		fprintf(stderr, "Fehler bei der Dateioeffnung von location.txt");
 		cout << "Fehler bei der Dateioeffnung von location.txt" << endl;
 	}
-	for (int i = 0;i < locint;i++) {
+	for (int i = 0; i < locint; i++) {
 		memset(&location[0], 0, locsize);
 		fgets(location, locsize, datei);
-		for (int i = 0;i < 10;i++) {
+		for (int i = 0; i < 10; i++) {
 			if (location[i] == '\n') {
 				location[i] = '\0';
 			}
@@ -263,13 +279,13 @@ void getimg(int imgint) {
 		cout << "Fehler bei der Dateioeffnung von images.txt" << endl;
 	}
 	char newimg[imgsize];
-	for (int i = 0;i < imgint;i++) {
+	for (int i = 0; i < imgint; i++) {
 		memset(&image[0], 0, sizeof(image));
 		while (fgets(newimg, imgsize, datei) != NULL) {
 			if (newimg[0] == 'e'&&newimg[1] == 'n'&&newimg[2] == 'd') {
 				break;
 			}
-			strncat(image, newimg, imgsize - strlen(image) - 1); 
+			strncat(image, newimg, imgsize - strlen(image) - 1);
 		}
 	}
 	fclose(datei);
@@ -282,7 +298,7 @@ void gettxt(int txtint) {
 		cout << "Fehler bei der Dateioeffnung von text.txt" << endl;
 	}
 	char newtxt[txtsize];
-	for (int i = 0;i < txtint;i++) {
+	for (int i = 0; i < txtint; i++) {
 		memset(&text[0], 0, sizeof(text));
 		while (fgets(newtxt, txtsize, datei) != NULL) {
 			if (newtxt[0] == 'e'&&newtxt[1] == 'n'&&newtxt[2] == 'd') {
@@ -295,6 +311,5 @@ void gettxt(int txtint) {
 }
 
 void room(int n) {
-	drawscreen(n,n,n);
+	drawscreen(n, n, n, "");
 }
-
