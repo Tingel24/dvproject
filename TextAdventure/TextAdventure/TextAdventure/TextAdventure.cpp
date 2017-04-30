@@ -21,6 +21,8 @@ void getloc(int);
 void getimg(int);
 void gettxt(int);
 void room(int);
+void init();
+
 
 int delay = 100;
 const int imgsize = 2500;
@@ -31,15 +33,38 @@ char location[locsize];
 char text[txtsize];
 
 static const char *titletheme = "..\\Music\\Visager\\TitleTheme.mp3";
+static const char *keyclick = "..\\Music\\click.wav";
+Mix_Music *music = NULL;
+Mix_Chunk *click = NULL;
+
 
 int main(int argc, char *argv[])
 {
 	testscreen();
+	init();
 	intro();	
 	mainmenu();
     return 0;
 }
 
+void init() {
+	int result = 0;
+	int flags = MIX_INIT_MP3;
+
+	if (SDL_Init(SDL_INIT_AUDIO) < 0) {
+		printf("Failed to init SDL\n");
+		exit(1);
+	}
+
+	if (flags != (result = Mix_Init(flags))) {
+		printf("Could not initialize mixer (result: %d).\n", result);
+		printf("Mix_Init: %s\n", Mix_GetError());
+		exit(1);
+	}
+
+	Mix_OpenAudio(22050, AUDIO_S16SYS, 2, 640);
+	Mix_VolumeMusic(30);
+}
 void testscreen() {
 	cout <<
 R"foo(
@@ -77,34 +102,9 @@ R"foo(
 }
 
 void intro() {
-	//PlaySound(TEXT("..\\Music\\Visager\\TitleTheme.wav"), NULL, SND_FILENAME | SND_ASYNC);
 
-
-	int result = 0;
-	int flags = MIX_INIT_MP3;
-
-	if (SDL_Init(SDL_INIT_AUDIO) < 0) {
-		printf("Failed to init SDL\n");
-		exit(1);
-	}
-
-	if (flags != (result = Mix_Init(flags))) {
-		printf("Could not initialize mixer (result: %d).\n", result);
-		printf("Mix_Init: %s\n", Mix_GetError());
-		exit(1);
-	}
-
-	Mix_OpenAudio(22050, AUDIO_S16SYS, 2, 640);
 	Mix_Music *music = Mix_LoadMUS(titletheme);
-	Mix_PlayMusic(music, 1);
-
-	while (!SDL_QuitRequested()) {
-		SDL_Delay(250);
-	}
-
-	Mix_FreeMusic(music);
-	SDL_Quit();
-
+	Mix_PlayMusic(music, -1);
 
 	for (int i = 0;i < 4;i++) {
 		cout <<
@@ -203,6 +203,8 @@ void startgame() {
 	int n=1;
 	while (true) {
 		cin >> answer;
+		Mix_Chunk *click = Mix_LoadWAV(keyclick);
+		Mix_PlayChannel(-1, click, 0);
 		if (answer == '1') {
 			n++;
 		}
@@ -211,6 +213,7 @@ void startgame() {
 		}
 		room(n);
 	}
+
 }
 
 void loadgame() {
