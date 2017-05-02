@@ -238,7 +238,7 @@ void startgame() {
 				n++;
 				drawscreen(n, n, n, "");	
 			}
-			if (answer == "links" && n==) {
+			if (answer == "links") {
 				
 			}
 		}
@@ -278,7 +278,7 @@ void drawscreen(int locint, int imgint, int txtint, char info[]) {
 
 void getloc(int locint) {
 	FILE *datei;
-	//Öfnnen von locations.txt
+	//Öffnen von locations.txt
 	if ((datei = fopen("locations.txt", "r")) == NULL) {
 		fprintf(stderr, "Fehler bei der Dateioeffnung von location.txt");
 		cout << "Fehler bei der Dateioeffnung von location.txt" << endl;
@@ -321,7 +321,7 @@ void getimg(int imgint) {
 
 void gettxt(int txtint) {
 	FILE *datei;
-	//Öfnnen von text.txt
+	//Öffnen von text.txt
 	if ((datei = fopen("text.txt", "r")) == NULL) {
 		fprintf(stderr, "Fehler bei der Dateioeffnung von text.txt");
 		cout << "Fehler bei der Dateioeffnung von text.txt" << endl;

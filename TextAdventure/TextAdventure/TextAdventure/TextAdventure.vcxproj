@@ -230,19 +230,7 @@
     <None Include="Help\basswma.chm" />
     <None Include="Help\basswv.chm" />
     <None Include="Help\bass_fx.chm" />
-    <None Include="LICENSE.rtf" />
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\BASS.ASIO.1.3.1.1\build\native\BASS.ASIO.targets" Condition="Exists('..\packages\BASS.ASIO.1.3.1.1\build\native\BASS.ASIO.targets')" />
-    <Import Project="..\packages\BASS.Native.2.4.12.1\build\native\BASS.Native.targets" Condition="Exists('..\packages\BASS.Native.2.4.12.1\build\native\BASS.Native.targets')" />
-  </ImportGroup>
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\BASS.ASIO.1.3.1.1\build\native\BASS.ASIO.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\BASS.ASIO.1.3.1.1\build\native\BASS.ASIO.targets'))" />
-    <Error Condition="!Exists('..\packages\BASS.Native.2.4.12.1\build\native\BASS.Native.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\BASS.Native.2.4.12.1\build\native\BASS.Native.targets'))" />
-  </Target>
+  <ImportGroup Label="ExtensionTargets" />
 </Project>
