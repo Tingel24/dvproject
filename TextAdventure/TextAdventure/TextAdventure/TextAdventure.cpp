@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include <iostream>
 #include "windows.h"
+#include "time.h"
 #include "string.h"
 #include <sstream>
 #include "mmsystem.h"
@@ -25,16 +26,25 @@ void getimg(int);
 void gettxt(int);
 void room(int);
 void init();
+void combat();
+void gameover();
 
 //Spielstand-Struktur
 struct savegame {
 	int room;
 	int delay;
+	int health;
+	int potions;
+
 };
 
 //Globale Variabeln:
 //Textgeschwindigkeit
 int delay = 50;
+//Lebensvariabel
+int health = 100;
+//Heilngsitems
+int potions = 3;
 //Festlegen der Arraygrößen
 const int imgsize = 2500;
 const int locsize = 10;
@@ -44,6 +54,7 @@ char location[locsize];
 char text[txtsize];
 
 //Musik-Pfade:
+static const char *gameovermus = "..\\Music\\Visager2\\Visager_-_23_-_Haunted_Forest_Loop.mp3";
 static const char *titletheme = "..\\Music\\Visager\\TitleTheme.mp3";
 static const char *keyclick = "..\\Music\\click.wav";
 Mix_Music *music = NULL;
@@ -126,7 +137,7 @@ void intro() {
 	Mix_Music *music = Mix_LoadMUS(titletheme);
 	Mix_PlayMusic(music, -1);
 	//Ausgabe der Intro-Animation
-	for (int i = 0; i < 4; i++) {
+	while(true) {
 		cout <<
 			R"foo(
 | |  | |     | |                              | |  | |               
@@ -224,6 +235,9 @@ void startgame() {
 	//Raumnummer
 	int n = 1;
 	while (true) {
+		if (n == 2 || n == 3) {
+			combat();
+		}
 		//Einlesen der Antwort
 		getline(cin, answer);
 		//SoundFX spielen
@@ -345,4 +359,167 @@ void gettxt(int txtint) {
 void room(int n) {
 	//Schnelles Aufrufen der drawscreen-Funktion
 	drawscreen(n, n, n, "");
+}
+
+void combat() {
+	system("cls");
+	int enemyhealth=100;
+	bool check = true;
+	srand(time(NULL));
+	int graphic = rand() % 100;
+	if (true) {
+		getimg(19);
+	}
+	
+
+	string answer;
+	while (true) {
+		if (!check) {
+			Sleep(2000);
+		}
+		check = false;
+		system("cls");
+		cout << image <<
+			R"foo(
++---------------------------------------------------------------------------------------------------+
+                                          Bandit: )foo" << enemyhealth << "HP" << R"foo(                                                               
++---------------------------------------------------------------------------------------------------+
+ [1] Attacke
+ [2] Heilen
+ [3] Fliehen
+
+)foo" << health << "HP      Potions:" <<potions<< R"foo(
++---------------------------------------------------------------------------------------------------+)foo" << endl;
+
+
+		if(health<=0){
+			gameover();
+		}
+		if (enemyhealth <= 0) {
+			startgame();
+		}
+
+		//Einlesen der Antwort
+		getline(cin, answer);
+		//SoundFX spielen
+		Mix_Chunk *click = Mix_LoadWAV(keyclick);
+		Mix_PlayChannel(-1, click, 0);
+
+		if (answer == "1") {
+			enemyhealth = enemyhealth - 30;
+			check = true;
+			cout << "Du greifst an" << endl;
+		}
+		else {
+			if (answer == "2") {
+				potions--;
+				health = health+70;
+				cout << "Du heilst dich" << endl;
+				check = true;
+			}
+			else{
+				if (answer=="3") {
+					cout << "Diese Welt ist nichts für Pussies!"<<endl;
+					check = true;
+				}
+				else {
+					if (answer.length() != 0) {
+						cout << "Bitte 1,2 oder 3 wählen" << endl;
+						check = false;
+
+					}
+				}
+			}
+		}
+		if(check){
+			if (rand() % 100 < 80) {
+				health = health - 30;
+				cout << "Der Bandit greif an" << endl;
+			}
+			else {
+				enemyhealth = enemyhealth + 30;
+				cout << "Der Bandit heilt sich" << endl;
+			}
+		}
+	check = false;
+	}
+}
+
+void gameover() {
+	//Starten der Hintergrundmusik
+	Mix_Music *music = Mix_LoadMUS(gameovermus);
+	Mix_PlayMusic(music, -1);
+	//Ausgabe der Intro-Animation
+	for (int i = 0; i < 4; i++) {
+		cout <<
+			R"foo( 
+   _____                         ____                 
+  / ____|                       / __ \                
+ | |  __  __ _ _ __ ___   ___  | |  | |_   _____ _ __ 
+ | | |_ |/ _` | '_ ` _ \ / _ \ | |  | \ \ / / _ \ '__|
+ | |__| | (_| | | | | | |  __/ | |__| |\ V /  __/ |   
+  \_____|\__,_|_| |_| |_|\___|  \____/  \_/ \___|_|   )foo";
+		Sleep(100);
+		system("CLS");
+		cout <<
+			R"foo( 
+    _____                         ____                 
+  / ____|                       / __ \                
+ | |  __  __ _ _ __ ___   ___  | |  | |_   _____ _ __ 
+ | | |_ |/ _` | '_ ` _ \ / _ \ | |  | \ \ / / _ \ '__|
+ | |__| | (_| | | | | | |  __/ | |__| |\ V /  __/ |   
+  \_____|\__,_|_| |_| |_|\___|  \____/  \_/ \___|_|   )foo";
+		Sleep(100);
+		system("CLS");
+		cout <<
+			R"foo( 
+   _____                         ____                 
+   / ____|                       / __ \                
+ | |  __  __ _ _ __ ___   ___  | |  | |_   _____ _ __ 
+ | | |_ |/ _` | '_ ` _ \ / _ \ | |  | \ \ / / _ \ '__|
+ | |__| | (_| | | | | | |  __/ | |__| |\ V /  __/ |   
+  \_____|\__,_|_| |_| |_|\___|  \____/  \_/ \___|_|   )foo";
+		Sleep(100);
+		system("CLS");
+		cout <<
+			R"foo( 
+   _____                         ____                 
+  / ____|                       / __ \                
+  | |  __  __ _ _ __ ___   ___  | |  | |_   _____ _ __ 
+ | | |_ |/ _` | '_ ` _ \ / _ \ | |  | \ \ / / _ \ '__|
+ | |__| | (_| | | | | | |  __/ | |__| |\ V /  __/ |   
+  \_____|\__,_|_| |_| |_|\___|  \____/  \_/ \___|_|   )foo";
+		Sleep(100);
+		system("CLS");
+		cout <<
+			R"foo( 
+   _____                         ____                 
+  / ____|                       / __ \                
+ | |  __  __ _ _ __ ___   ___  | |  | |_   _____ _ __ 
+  | | |_ |/ _` | '_ ` _ \ / _ \ | |  | \ \ / / _ \ '__|
+ | |__| | (_| | | | | | |  __/ | |__| |\ V /  __/ |   
+  \_____|\__,_|_| |_| |_|\___|  \____/  \_/ \___|_|   )foo";
+		Sleep(100);
+		system("CLS");
+		cout <<
+			R"foo( 
+   _____                         ____                 
+  / ____|                       / __ \                
+ | |  __  __ _ _ __ ___   ___  | |  | |_   _____ _ __ 
+ | | |_ |/ _` | '_ ` _ \ / _ \ | |  | \ \ / / _ \ '__|
+  | |__| | (_| | | | | | |  __/ | |__| |\ V /  __/ |   
+  \_____|\__,_|_| |_| |_|\___|  \____/  \_/ \___|_|   )foo";
+		Sleep(100);
+		system("CLS");
+		cout <<
+			R"foo( 
+   _____                         ____                 
+  / ____|                       / __ \                
+ | |  __  __ _ _ __ ___   ___  | |  | |_   _____ _ __ 
+ | | |_ |/ _` | '_ ` _ \ / _ \ | |  | \ \ / / _ \ '__|
+ | |__| | (_| | | | | | |  __/ | |__| |\ V /  __/ |   
+   \_____|\__,_|_| |_| |_|\___|  \____/  \_/ \___|_|   )foo";
+		Sleep(100);
+		system("CLS");
+	}
 }
