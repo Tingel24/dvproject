@@ -20,7 +20,7 @@ void intro();
 void mainmenu();
 void startgame();
 void loadgame();
-void drawscreen(int, int, int, char[]);
+void drawscreen(int, int, int, string);
 void getloc(int);
 void getimg(int);
 void gettxt(int);
@@ -43,8 +43,13 @@ struct savegame {
 int delay = 50;
 //Lebensvariabel
 int health = 100;
+//Lebensvariabel der Gegner
+int gegnerleben = 100;
 //Heilngsitems
 int potions = 3;
+//Raumnummer
+int raumnr = 1;
+
 //Festlegen der Arraygrößen
 const int imgsize = 2500;
 const int locsize = 10;
@@ -101,10 +106,6 @@ void testscreen() {
 		R"foo(
 +---------------------------------------------------------------------------------------------------------------+
 |                                                                                                               |
-|                                     Resize to show complete box                                               |
-|                                      for game to work correctly                                               |
-|                                                                                                               |
-|                                       Dont resize after this!                                                 |
 |                                                                                                               |
 |                                                                                                               |
 |                                                                                                               |
@@ -116,6 +117,10 @@ void testscreen() {
 |                                                                                                               |
 |                                                                                                               |
 |                                                                                                               |
+|                                      Resize to show complete box                                              |
+|                                       for game to work correctly                                              |
+|                                                                                                               |
+|                                        dont resize after this!                                                |
 |                                                                                                               |
 |                                                                                                               |
 |                                                                                                               |
@@ -137,7 +142,7 @@ void intro() {
 	Mix_Music *music = Mix_LoadMUS(titletheme);
 	Mix_PlayMusic(music, -1);
 	//Ausgabe der Intro-Animation
-	while(true) {
+	for (int i = 0; i < 4; i++) {
 		cout <<
 			R"foo(
 | |  | |     | |                              | |  | |               
@@ -221,7 +226,11 @@ void mainmenu() {
 	cin >> answer;
 	answer = atoi(&answer);
 	switch (answer) {
-	case 1:startgame();
+	case 1:
+		//Ersten Raum laden
+		drawscreen(1, 1, 1, " ");
+		//Spiel starten
+		startgame();
 		break;
 	case 2:loadgame();
 		break;
@@ -229,13 +238,13 @@ void mainmenu() {
 }
 
 void startgame() {
-	//Ersten Raum laden
-	drawscreen(1, 1, 1, "");
 	string answer;
-	//Raumnummer
-	int n = 1;
 	while (true) {
-		if (n == 2 || n == 3) {
+		srand(time(NULL));
+		if (rand() % 100 < 10) {
+			system("cls");
+			cout << "Ein Bandit greift an!" << endl;
+			Sleep(2000);
 			combat();
 		}
 		//Einlesen der Antwort
@@ -244,16 +253,14 @@ void startgame() {
 		Mix_Chunk *click = Mix_LoadWAV(keyclick);
 		Mix_PlayChannel(-1, click, 0);
 
-		if (answer == "geh" || answer == "gehe" || answer == "go" || answer == "lauf") {
-			drawscreen(n, n, n, "Wohin willst du gehen?");
+		if (answer == "geh" || answer == "gehe" || answer == "go" || answer == "lauf" || answer == "geradeaus" || answer == "Norden" || answer == "Nord" || answer == "gerade" || answer == "Tür" || answer == "Door" || answer == "front") {
+			drawscreen(raumnr, raumnr, raumnr, "Willst du in den nächsten Raum gehen? (y/n)");
 			memset(&answer[0], 0, 10);
 			cin >> answer;
-			if (answer == "geradeaus" || answer == "Norden" || answer == "Nord" || answer == "gerade" || answer == "Tür" || answer == "Door" || answer == "front") {
-				n++;
-				drawscreen(n, n, n, "");	
-			}
-			if (answer == "links") {
-				
+			answer = tolower(answer[0]);
+			if (answer=="y") {
+				raumnr++;
+				drawscreen(raumnr, raumnr, raumnr, " ");
 			}
 		}
 		else {
@@ -269,7 +276,7 @@ void loadgame() {
 
 }
 
-void drawscreen(int locint, int imgint, int txtint, char info[]) {
+void drawscreen(int locint, int imgint, int txtint, string info) {
 	system("CLS");
 	//Modulares System um gleiche Assets mehrmals zu benutzen
 	getloc(locint);
@@ -281,8 +288,12 @@ void drawscreen(int locint, int imgint, int txtint, char info[]) {
 +---------------------------------------------------------------------------------------------------+
                                  )foo" << location << R"foo(                                                                            
 +---------------------------------------------------------------------------------------------------+
-)foo"; for (int i = 0; text[i] != NULL; i++) { cout << text[i]; Sleep(delay); }
-	for (int i = 0; info[i] != NULL; i++) { cout << info[i]; Sleep(delay); } cout << R"foo(
+)foo"; if (info.length() != NULL) { 
+		for (int i = 0; text[i] != NULL; i++) {
+			cout << text[i]; Sleep(delay);
+		} 
+	}
+	 cout<< info << R"foo(
 
 
 
@@ -358,12 +369,12 @@ void gettxt(int txtint) {
 
 void room(int n) {
 	//Schnelles Aufrufen der drawscreen-Funktion
-	drawscreen(n, n, n, "");
+	drawscreen(n, n, n, " ");
 }
 
 void combat() {
 	system("cls");
-	int enemyhealth=100;
+	int enemyhealth = gegnerleben;
 	bool check = true;
 	srand(time(NULL));
 	int graphic = rand() % 100;
@@ -374,9 +385,6 @@ void combat() {
 
 	string answer;
 	while (true) {
-		if (!check) {
-			Sleep(2000);
-		}
 		check = false;
 		system("cls");
 		cout << image <<
@@ -396,6 +404,17 @@ void combat() {
 			gameover();
 		}
 		if (enemyhealth <= 0) {
+			system("cls");
+			cout << "Der Bandit wurde besiegt!" << endl;
+			if (rand() % 100 < 80) {
+				potions++;
+				cout << "Du sammelst 1 Heilungstrank ein" << endl;
+			}
+			else {
+				potions = potions + 3;
+					cout << "Du sammelst 3 Heilungstrank ein" << endl;
+			}
+			Sleep(2000);
 			startgame();
 		}
 
@@ -408,22 +427,26 @@ void combat() {
 		if (answer == "1") {
 			enemyhealth = enemyhealth - 30;
 			check = true;
+			cout << endl;
 			cout << "Du greifst an" << endl;
 		}
 		else {
 			if (answer == "2") {
 				potions--;
 				health = health+70;
+				cout << endl;
 				cout << "Du heilst dich" << endl;
 				check = true;
 			}
 			else{
 				if (answer=="3") {
-					cout << "Diese Welt ist nichts für Pussies!"<<endl;
+					cout << endl;
+					cout << "Diese Welt ist nichts für Weicheier!"<<endl;
 					check = true;
 				}
 				else {
-					if (answer.length() != 0) {
+					if (answer.length() != NULL) {
+						cout << endl;
 						cout << "Bitte 1,2 oder 3 wählen" << endl;
 						check = false;
 
@@ -434,14 +457,16 @@ void combat() {
 		if(check){
 			if (rand() % 100 < 80) {
 				health = health - 30;
-				cout << "Der Bandit greif an" << endl;
+				cout << "Der Bandit greift an" << endl;
+				cout << endl;
 			}
 			else {
 				enemyhealth = enemyhealth + 30;
 				cout << "Der Bandit heilt sich" << endl;
+				cout << endl;
 			}
 		}
-	check = false;
+		system("pause");
 	}
 }
 
@@ -450,7 +475,7 @@ void gameover() {
 	Mix_Music *music = Mix_LoadMUS(gameovermus);
 	Mix_PlayMusic(music, -1);
 	//Ausgabe der Intro-Animation
-	for (int i = 0; i < 4; i++) {
+	while(true) {
 		cout <<
 			R"foo( 
    _____                         ____                 
