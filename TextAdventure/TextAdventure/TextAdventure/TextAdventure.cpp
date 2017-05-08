@@ -33,7 +33,7 @@ void gameover();
 void combatintro();
 void listitems();
 void wingame();
-
+void help();
 
 
 //Spielstand-Struktur
@@ -418,6 +418,8 @@ void startgame() {
 		Mix_Chunk *click = Mix_LoadWAV(keyclick);
 		Mix_PlayChannel(-1, click, 0);
 
+
+
 		if (answer == "geh" || answer == "gehe" || answer == "go" || answer == "lauf" || answer == "geradeaus" || answer == "norden" || answer == "nord" || answer == "gerade" || answer == "tür" || answer == "door" || answer == "front") {
 			drawscreen(raumnr, raumnr, raumnr, "Willst du in den nächsten Raum gehen? (y/n)");
 			memset(&answer[0], 0, 10);
@@ -450,11 +452,17 @@ void startgame() {
 				check = false;
 			}
 		}
+		if (answer == "help" || answer == "hilfe" || answer == "commands" || answer == "info") {
+			help();
+			check = false;
+		}
 		if (check) {
 			if (answer.length() != 0) {
 				cout << "Begriff: " << answer << " nicht verstanden" << endl;
 			}
 		}
+		
+
 		check = true;
 	}
 
@@ -477,9 +485,9 @@ void loadgame() {
 	cout <<
 		R"foo(
 Welchen Spielstand möchtest du laden?
-[1]
-[2]
-[3]
+[1])foo" << Bred << saves[0].health << " Leben  " << yellow << saves[0].potions << " Heiltränke  " << green << saves[0].room << " Raum  " << normal << R"foo(
+[2])foo" << Bred << saves[1].health << " Leben  " << yellow << saves[1].potions << " Heiltränke  " << green << saves[1].room << " Raum  " << normal << R"foo(
+[3])foo" << Bred << saves[2].health << " Leben  " << yellow << saves[2].potions << " Heiltränke  " << green << saves[2].room << " Raum  " << normal << R"foo(
 )foo" << endl;
 	char answer;
 	int n;
@@ -530,9 +538,9 @@ void save() {
 	cout <<
 		R"foo(
 In welchem Slot willst du speichern?
-[1]
-[2]
-[3]
+[1])foo" << Bred << saves[0].health << " Leben  " << yellow << saves[0].potions << " Heiltränke  " << green << saves[0].room << " Raum  " << normal << R"foo(
+[2])foo" << Bred << saves[1].health << " Leben  " << yellow << saves[1].potions << " Heiltränke  " << green << saves[1].room << " Raum  " << normal << R"foo(
+[3])foo" << Bred << saves[2].health << " Leben  " << yellow << saves[2].potions << " Heiltränke  " << green << saves[2].room << " Raum  " << normal << R"foo(
 		)foo" << endl;
 	char answer;
 	cin >> answer;
@@ -543,7 +551,7 @@ In welchem Slot willst du speichern?
 		break;
 	case 2: fseek(datei, sizeof(savegame), SEEK_SET); fwrite(saves, sizeof(savegame), 1, datei);
 		break;
-	case 3:fseek(datei, sizeof(savegame)*2, SEEK_SET); fwrite(saves, sizeof(savegame), 1, datei);
+	case 3:fseek(datei, sizeof(savegame) * 2, SEEK_SET); fwrite(saves, sizeof(savegame), 1, datei);
 		break;
 	}
 
@@ -728,7 +736,7 @@ void combat() {
 			if (answer == "2") {
 				if (potions != 0) {
 					potions--;
-					health = health + (rand() % 50)+10;
+					health = health + (rand() % 50) + 10;
 					cout << endl;
 					cout << "Du heilst dich" << endl;
 					check = true;
@@ -1015,4 +1023,48 @@ void wingame() {
 		Sleep(100);
 		system("CLS");
 	}
+}
+
+void help() {
+	cout << "Mögliche Kommandos sind:" << endl;
+	cout <<
+		R"foo( 
+Bewegung:
+geh
+gehe
+go
+lauf
+geradeaus
+norden
+nord
+gerade
+tür
+door
+front
+
+Speichern:
+save
+speichern
+speicher
+
+Umgebung:
+look
+guck
+schau
+seh
+
+Heilung:
+heilung
+trank
+heiltrank
+potion
+potions
+
+Hilfe:
+help
+hilfe
+commands
+?
+info
+)foo";
 }
