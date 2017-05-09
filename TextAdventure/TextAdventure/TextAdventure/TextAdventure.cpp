@@ -91,6 +91,13 @@ char Lgray[] = { 0x1b, '[', '0', ';', '3', '7', 'm', 0 };
 char Dgray[] = { 0x1b, '[', '0', ';', '3', '8', 'm', 0 };
 char Bred[] = { 0x1b, '[', '1', ';', '3', '1', 'm', 0 };
 
+const unsigned char AE = static_cast<unsigned char>(142);
+const unsigned char ae = static_cast<unsigned char>(132);
+const unsigned char OE = static_cast<unsigned char>(153);
+const unsigned char oe = static_cast<unsigned char>(148);
+const unsigned char UE = static_cast<unsigned char>(154);
+const unsigned char ue = static_cast<unsigned char>(129);
+const unsigned char ss = static_cast<unsigned char>(225);
 
 int main(int argc, char *argv[])
 {
@@ -421,7 +428,7 @@ void startgame() {
 
 
 		if (answer == "geh" || answer == "gehe" || answer == "go" || answer == "lauf" || answer == "geradeaus" || answer == "norden" || answer == "nord" || answer == "gerade" || answer == "tür" || answer == "door" || answer == "front") {
-			drawscreen(raumnr, raumnr, raumnr, "Willst du in den nächsten Raum gehen? (y/n)");
+			drawscreen(raumnr, raumnr, raumnr, "Willst du in den naechsten Raum gehen? (y/n)");
 			memset(&answer[0], 0, 10);
 			cin >> answer;
 			answer = tolower(answer[0]);
@@ -445,10 +452,11 @@ void startgame() {
 				health = health + (rand() % 50) + 10;
 				cout << endl;
 				cout << "Du heilst dich" << endl;
+				cout << "Du hast noch " << potions << ". Heiltr" << ae << "nke" << endl;
 				check = false;
 			}
 			else {
-				cout << "Du hast keine Heiltränke mehr!" << endl;
+				cout << "Du hast keine Heiltr" << ae << "nke mehr!" << endl;
 				check = false;
 			}
 		}
@@ -461,7 +469,7 @@ void startgame() {
 				cout << "Begriff: " << answer << " nicht verstanden" << endl;
 			}
 		}
-		
+
 
 		check = true;
 	}
@@ -477,7 +485,7 @@ void loadgame() {
 	for (int i = 0; (fread(&saves[i], sizeof(struct savegame), 1, datei)) != NULL; i++) {
 		if (i == 3)
 		{
-			cout << "ACHTUNG: Die zulässige Anzahl an Datensätzen wurde überschritten<<" << endl;
+			cout << "ACHTUNG: Die zul" << ae << "ssige Anzahl an Datens" << ae << "tzen wurde " << ue << "berschritten<<" << endl;
 			break;
 		}
 	}
@@ -485,9 +493,9 @@ void loadgame() {
 	cout <<
 		R"foo(
 Welchen Spielstand möchtest du laden?
-[1])foo" << Bred << saves[0].health << " Leben  " << yellow << saves[0].potions << " Heiltränke  " << green << saves[0].room << " Raum  " << normal << R"foo(
-[2])foo" << Bred << saves[1].health << " Leben  " << yellow << saves[1].potions << " Heiltränke  " << green << saves[1].room << " Raum  " << normal << R"foo(
-[3])foo" << Bred << saves[2].health << " Leben  " << yellow << saves[2].potions << " Heiltränke  " << green << saves[2].room << " Raum  " << normal << R"foo(
+[1])foo" << Bred << saves[0].health << " Leben  " << yellow << saves[0].potions << " Heiltr" << ae << "nke  " << green << saves[0].room << " Raum  " << normal << R"foo(
+[2])foo" << Bred << saves[1].health << " Leben  " << yellow << saves[1].potions << " Heiltr" << ae << "nke  " << green << saves[1].room << " Raum  " << normal << R"foo(
+[3])foo" << Bred << saves[2].health << " Leben  " << yellow << saves[2].potions << " Heiltr" << ae << "nke  " << green << saves[2].room << " Raum  " << normal << R"foo(
 )foo" << endl;
 	char answer;
 	int n;
@@ -505,7 +513,7 @@ Welchen Spielstand möchtest du laden?
 		cout << "Dieser Spielstand ist leer" << endl;
 		char c;
 		do {
-			cout << "Einen anderen wählen?(y/n)" << endl;
+			cout << "Einen anderen w" << ae << "hlen?(y/n)" << endl;
 			cin >> c;
 			c = tolower(c);
 			if (c == 'y') {
@@ -538,9 +546,9 @@ void save() {
 	cout <<
 		R"foo(
 In welchem Slot willst du speichern?
-[1])foo" << Bred << saves[0].health << " Leben  " << yellow << saves[0].potions << " Heiltränke  " << green << saves[0].room << " Raum  " << normal << R"foo(
-[2])foo" << Bred << saves[1].health << " Leben  " << yellow << saves[1].potions << " Heiltränke  " << green << saves[1].room << " Raum  " << normal << R"foo(
-[3])foo" << Bred << saves[2].health << " Leben  " << yellow << saves[2].potions << " Heiltränke  " << green << saves[2].room << " Raum  " << normal << R"foo(
+[1])foo" << Bred << saves[0].health << " Leben  " << yellow << saves[0].potions << " Heiltr" << ae << "nke  " << green << saves[0].room << " Raum  " << normal << R"foo(
+[2])foo" << Bred << saves[1].health << " Leben  " << yellow << saves[1].potions << " Heiltr" << ae << "nke  " << green << saves[1].room << " Raum  " << normal << R"foo(
+[3])foo" << Bred << saves[2].health << " Leben  " << yellow << saves[2].potions << " Heiltr" << ae << "nke  " << green << saves[2].room << " Raum  " << normal << R"foo(
 		)foo" << endl;
 	char answer;
 	cin >> answer;
@@ -742,19 +750,19 @@ void combat() {
 					check = true;
 				}
 				else {
-					cout << "Du hast keine Heiltränke mehr!" << endl;
+					cout << "Du hast keine Heiltr" << ae << "nke mehr!" << endl;
 				}
 			}
 			else {
 				if (answer == "3") {
 					cout << endl;
-					cout << "Diese Welt ist nichts für Weicheier!" << endl;
+					cout << "Diese Welt ist nichts f" << ue << "r Weicheier!" << endl;
 					check = true;
 				}
 				else {
 					if (answer.length() != NULL) {
 						cout << endl;
-						cout << "Bitte 1,2 oder 3 wählen" << endl;
+						cout << "Bitte 1,2 oder 3 w" << ae << "hlen" << endl;
 						check = false;
 
 					}
@@ -1002,7 +1010,7 @@ void gameover() {
 void listitems() {
 	string list = "Ich sehe ";
 	if (raumnr != 6 || raumnr != 12 || raumnr != 18) {
-		list += "eine Tür";
+		list += "eine T<<üe<<r";
 	}
 	drawscreen(raumnr, raumnr, raumnr, list);
 }
@@ -1026,7 +1034,7 @@ void wingame() {
 }
 
 void help() {
-	cout << "Mögliche Kommandos sind:" << endl;
+	cout << "M" << oe << "gliche Kommandos sind:" << endl;
 	cout <<
 		R"foo( 
 Bewegung:
