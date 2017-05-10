@@ -34,6 +34,7 @@ void combatintro();
 void listitems();
 void wingame();
 void help();
+void settings();
 
 
 //Spielstand-Struktur
@@ -71,6 +72,7 @@ static const char *winmus = "..\\Music\\Visager2\\Visager_-_02_-_Royal_Entrance.
 static const char *gameovermus = "..\\Music\\Visager2\\Visager_-_23_-_Haunted_Forest_Loop.mp3";
 static const char *mausoleum = "..\\Music\\Visager2\\Visager_-_11_-_Eerie_Mausoleum.mp3";
 static const char *icecave = "..\\Music\\Visager\\Visager_-_07_-_Ice_Cave.mp3";
+static const char *throne = "..\\Music\\Visager2\\Visager_-_03_-_Throne_Room.mp3";
 static const char *combatintromusic = "..\\Music\\Visager2\\Visager_-_21_-_Battle_Intro.mp3";
 static const char *combatmusic = "..\\Music\\Visager2\\Visager_-_22_-_Battle_Loop.mp3";
 static const char *titletheme = "..\\Music\\Visager\\TitleTheme.mp3";
@@ -154,6 +156,7 @@ void testscreen() {
 |                                       for game to work correctly                                              |
 |                                                                                                               |
 |                                        dont resize after this!                                                |
+|                                                                                                               |
 |                                                                                                               |
 |                                                                                                               |
 |                                                                                                               |
@@ -378,23 +381,25 @@ void intro() {
 }
 
 void mainmenu() {
-	system("CLS");
-	cout << R"foo(
+	while (true) {
+		system("CLS");
+		cout << R"foo(
    *--------------------*
    | [1] Start New Game |
    | [2] Load Game      |
    *--------------------*
 )foo" << endl;
-	char answer;
-	cin >> answer;
-	answer = atoi(&answer);
-	switch (answer) {
-	case 1:
-		//Spiel starten
-		startgame();
-		break;
-	case 2:loadgame();
-		break;
+		char answer;
+		cin >> answer;
+		answer = atoi(&answer);
+		switch (answer) {
+		case 1:
+			//Spiel starten
+			startgame();
+			break;
+		case 2:loadgame();
+			break;
+		}
 	}
 }
 
@@ -404,8 +409,22 @@ void startgame() {
 	}
 	room(raumnr);
 	//Starten der Hintergrundmusik
-	Mix_Music *music = Mix_LoadMUS(mausoleum);
-	Mix_PlayMusic(music, -1);
+	srand(time(NULL));
+	int musicchoice = rand() % 100;
+	if (musicchoice <= 33) {
+		Mix_Music *music = Mix_LoadMUS(mausoleum);
+		Mix_PlayMusic(music, -1);
+	}
+	if (musicchoice >= 66) {
+		Mix_Music *music = Mix_LoadMUS(icecave);
+		Mix_PlayMusic(music, -1);
+	}
+	if (musicchoice > 33 && musicchoice < 66) {
+		Mix_Music *music = Mix_LoadMUS(throne);
+		Mix_PlayMusic(music, -1);
+	}
+	
+
 	string answer;
 	int raumnrcheck = 0;
 	bool check = false;
@@ -464,6 +483,13 @@ void startgame() {
 			help();
 			check = false;
 		}
+
+		if (answer == "settings" || answer == "einstellungen" || answer == "einstellung") {
+			settings();
+			room(raumnr);
+			check = false;
+		}
+
 		if (check) {
 			if (answer.length() != 0) {
 				cout << "Begriff: " << answer << " nicht verstanden" << endl;
@@ -1032,6 +1058,129 @@ void wingame() {
 		system("CLS");
 	}
 }
+
+void settings() {
+	system("cls");
+	cout <<
+		R"foo( 
+Einstellungen:
+
+[1] Textgeschwindigkeit
+[2] Schwierigkeit
+[3] Audio
+[4] Exit
+)foo";
+	char answer;
+	cin >> answer;
+	answer = atoi(&answer);
+
+	switch (answer) {
+	case 1:
+		system("cls");
+		cout <<
+			R"foo( 
+Textgeschwindigkeit:
+
+[1] Langsam
+[2] Normal
+[3] Schnell
+[4] Hyperdrive
+)foo";
+		char answertxt;
+		cin >> answertxt;
+		answertxt = atoi(&answertxt);
+
+		switch (answertxt) {
+		case 1: delay = 100;
+			cout << "Textgeschwindigkeit = Langsam" << endl;
+			break;
+		case 2: delay = 50;
+			cout << "Textgeschwindigkeit = Normal" << endl;
+			break;
+		case 3:delay = 25;
+			cout << "Textgeschwindigkeit = Schnell" << endl;
+			break;
+		case 4:delay = 1;
+			cout << "Textgeschwindigkeit = Hyperdrive" << endl;
+			break;
+		}
+		break;
+	case 2:
+		system("cls");
+		cout <<
+			R"foo( 
+Schwierigkeit:
+
+[1] Einfach
+[2] Normal
+[3] Schwer
+)foo";
+		char answerdiff;
+		cin >> answerdiff;
+		answerdiff = atoi(&answerdiff);
+
+		switch (answerdiff) {
+		case 1: gegnerleben = 50;
+			cout << "Schwierigkeit = Einfach" << endl;
+			break;
+		case 2: gegnerleben = 100;
+			cout << "Schwierigkeit = Normal" << endl;
+			break;
+		case 3:gegnerleben = 150;
+			cout << "Schwierigkeit = Schwer" << endl;
+			break;
+		}
+		break;
+	case 3:
+		system("cls");
+		cout <<
+			R"foo( 
+Audio:
+
+[1] Lautst)foo" << ae << R"foo(rke
+[2] Musik
+)foo";
+		char answermus;
+		cin >> answermus;
+		answermus = atoi(&answermus);
+
+		switch (answermus) {
+		case 1:
+			system("cls");
+			cout <<
+				R"foo( 
+Lautst)foo" << ae << R"foo(rke:
+
+Gib einen Wert zwischen 0 und 128 ein, um die Lautst)foo" << ae << R"foo(rke zu )foo" << ae << R"foo(ndern.
+Normal ist 30
+Im Moment ist )foo" << Mix_VolumeMusic(-1) << R"foo( eingestellt)foo" << endl;
+
+			int volume;
+			cin >> volume;
+			if (volume >= 0 && volume >= 128) {
+				Mix_VolumeMusic(volume);
+			}
+			break;
+		case 2:
+			system("cls");
+			cout <<
+				R"foo(
+Musik:
+[1] AUS
+[2] AN
+)foo";
+			int musikswitch;
+			cin >> musikswitch;
+			if (musikswitch == 1 && Mix_PausedMusic() == 0) {
+				Mix_PauseMusic();
+			}if (musikswitch == 2) {
+				Mix_ResumeMusic();
+			}
+			break;
+		}
+	}
+}
+
 
 void help() {
 	cout << "M" << oe << "gliche Kommandos sind:" << endl;
