@@ -20,7 +20,7 @@ void testscreen();
 void intro();
 void mainmenu();
 void startgame();
-void loadgame();
+void loadgame(bool);
 void save();
 void drawscreen(int, int, int, string, bool);
 void getloc(int);
@@ -93,6 +93,7 @@ char Lgray[] = { 0x1b, '[', '0', ';', '3', '7', 'm', 0 };
 char Dgray[] = { 0x1b, '[', '0', ';', '3', '8', 'm', 0 };
 char Bred[] = { 0x1b, '[', '1', ';', '3', '1', 'm', 0 };
 
+//Um einige Charaktere richtig anzuzeigen:
 const unsigned char AE = static_cast<unsigned char>(142);
 const unsigned char ae = static_cast<unsigned char>(132);
 const unsigned char OE = static_cast<unsigned char>(153);
@@ -384,13 +385,15 @@ void mainmenu() {
 			//Spiel starten
 			startgame();
 			break;
-		case 2:loadgame();
+			//Spiel laden
+		case 2:loadgame(true);
 			break;
+			// Einstellungen
 		case 3:settings();
 			break;
-		case 4:
-			FreeConsole();
-			break;
+			//Exit
+		case 4:gameover();
+			// Versteckte Optionen
 		case 5:dev();
 			break;
 		}
@@ -400,6 +403,7 @@ void mainmenu() {
 void startgame() {
 	//Starten der Hintergrundmusik
 	srand(time(NULL));
+	//Zufällige Musikauswahl
 	int musicchoice = rand() % 100;
 	if (musicchoice <= 33) {
 		Mix_Music *music = Mix_LoadMUS(mausoleum);
@@ -413,23 +417,28 @@ void startgame() {
 		Mix_Music *music = Mix_LoadMUS(throne);
 		Mix_PlayMusic(music, -1);
 	}
-
+	//Ersten Raum anzeigen
 	room(raumnr);
-
+	//Variablen definieren
 	string answer;
 	int raumnrcheck = 0;
 	bool check = false;
+	//Schleife für Eingabe
 	while (true) {
+		//Bedingung für Spielende
 		if (raumnr == 19) {
 			wingame();
 		}
+		//Bedingungen für besondere Events
 		if (raumnr == 3) {
 			potions++;
 		}
 		if (raumnr == 4) {
 			potions = potions + 3;
 		}
+		//Zufälliger Kampf
 		srand(time(NULL));
+		//10% Chance,keine zwei Kämpfe im selben Raum, kein Kampf im ersten Raum
 		if (rand() % 100 < 10 && raumnrcheck != raumnr&&raumnr != 1) {
 			Sleep(1000);
 			system("cls");
@@ -444,7 +453,8 @@ void startgame() {
 		//SoundFX spielen
 		Mix_Chunk *click = Mix_LoadWAV(keyclick);
 		Mix_PlayChannel(-1, click, 0);
-
+		//Verschiedene Optionen für die Eingabe:
+		//Bewegung
 		if (answer == "geh" || answer == "gehe" || answer == "go" || answer == "lauf" || answer == "geradeaus" || answer == "norden" || answer == "nord" || answer == "gerade" || answer == "tür" || answer == "door" || answer == "front") {
 			drawscreen(raumnr, raumnr, raumnr, "Willst du in den naechsten Raum gehen? (y/n)", 0);
 			memset(&answer[0], 0, 10);
@@ -459,17 +469,22 @@ void startgame() {
 				check = false;
 			}
 		}
+		//Speichern
 		if (answer == "save" || answer == "speichern" || answer == "speicher") {
 			save();
 			check = false;
 		}
+		//Gegenstände im Raum auflisten
 		if (answer == "look" || answer == "guck" || answer == "schau" || answer == "seh") {
 			listitems();
 			check = false;
 		}
+		//Zurück ins Hauptmenu
 		if (answer == "exit" || answer == "mainmenu" || answer == "menu") {
 			mainmenu();
+			check = false;
 		}
+		//Heiltränke nutzen
 		if (answer == "heilung" || answer == "trank" || answer == "heiltrank" || answer == "potion" || answer == "potions") {
 			if (potions != 0) {
 				cout << endl;
@@ -491,17 +506,18 @@ void startgame() {
 				check = false;
 			}
 		}
+		//Liste der Kommandos anzeigen
 		if (answer == "help" || answer == "hilfe" || answer == "commands" || answer == "info") {
 			help();
 			check = false;
 		}
-
+		//Einstellungen aufrufen
 		if (answer == "settings" || answer == "einstellungen" || answer == "einstellung") {
 			settings();
 			drawscreen(raumnr, raumnr, raumnr, "", 0);
 			check = false;
 		}
-
+		//Nicht verstandene Begriffe anzeigen
 		if (check) {
 			if (answer.length() != 0) {
 				cout << "Begriff: " << answer << " nicht verstanden" << endl;
@@ -512,106 +528,105 @@ void startgame() {
 	}
 }
 
-void loadgame() {
+void loadgame(bool c) {
 	FILE* datei;
+	//Datei öffnen
 	if ((datei = fopen("save.bin", "rb")) == NULL)
 	{
 		fprintf(stderr, "Fehler bei der Dateioeffnung");
 	}
-	for (int i = 0; (fread(&saves[i], sizeof(struct savegame), 1, datei)) != NULL; i++) {
-		if (i == 3)
-		{
-			break;
-		}
+	//3 Datensätze einlesen
+	for (int i = 0; i < 4; i++) {
+		fread(&saves[i], sizeof(struct savegame), 1, datei);
 	}
+	//Datei schließen
 	fclose(datei);
-	cout <<
-		R"foo(
+
+	if (c) {
+		//Spielstand-Info ausgeben
+		cout <<
+			R"foo(
 Welchen Spielstand m)foo" << oe << R"foo(chtest du laden?
-[1])foo" << Bred << saves[0].health << " Leben  " << yellow << saves[0].potions << " Heiltr" << ae << "nke  " << green << saves[0].room << " Raum  " << normal << R"foo(
-[2])foo" << Bred << saves[1].health << " Leben  " << yellow << saves[1].potions << " Heiltr" << ae << "nke  " << green << saves[1].room << " Raum  " << normal << R"foo(
-[3])foo" << Bred << saves[2].health << " Leben  " << yellow << saves[2].potions << " Heiltr" << ae << "nke  " << green << saves[2].room << " Raum  " << normal << R"foo(
+[1])foo" << green << saves[0].room << " Raum  " << Bred << saves[0].health << " Leben  " << yellow << saves[0].potions << " Heiltr" << ae << "nke  " << normal << R"foo(
+[2])foo" << green << saves[1].room << " Raum  " << Bred << saves[1].health << " Leben  " << yellow << saves[1].potions << " Heiltr" << ae << "nke  " << normal << R"foo(
+[3])foo" << green << saves[2].room << " Raum  " << Bred << saves[2].health << " Leben  " << yellow << saves[2].potions << " Heiltr" << ae << "nke  " << normal << R"foo(
 [4] Exit
 )foo" << endl;
-	char answer;
-	int n;
-	cin >> answer;
-	if (answer == '1' || answer == '2' || answer == '3') {
-		//SoundFX spielen
-		Mix_Chunk *click = Mix_LoadWAV(keyclick);
-		Mix_PlayChannel(-1, click, 0);
-		answer = atoi(&answer);
-		n = answer;
-		if (saves[n].room != NULL) {
-			delay = saves[n].delay;
-			health = saves[n].health;
-			raumnr = saves[n].room;
-			potions = saves[n].potions;
-			startgame();
+		//Antwort einlesen
+		char answer;
+		int n;
+		cin >> answer;
+		if (answer == '1' || answer == '2' || answer == '3') {
+			//SoundFX spielen
+			Mix_Chunk *click = Mix_LoadWAV(keyclick);
+			Mix_PlayChannel(-1, click, 0);
+			answer = atoi(&answer);
+			n = answer;
+			//Eingelesen Daten auf Spieldaten einlesen
+			if (saves[n].room != NULL) {
+				delay = saves[n].delay;
+				health = saves[n].health;
+				raumnr = saves[n].room;
+				potions = saves[n].potions;
+				startgame();
+			}
+			else {
+				cout << "Dieser Spielstand ist leer" << endl;
+				char c;
+				do {
+					cout << "Einen anderen w" << ae << "hlen?(y/n)" << endl;
+					cin >> c;
+					//SoundFX spielen
+					Mix_PlayChannel(-1, click, 0);
+					c = tolower(c);
+					if (c == 'y') {
+						loadgame(true);
+					}
+					if (c == 'n') {
+						mainmenu();
+					}
+				} while (c != 'y' || c != 'n');
+			}
 		}
 		else {
-			cout << "Dieser Spielstand ist leer" << endl;
-			char c;
-			do {
-				cout << "Einen anderen w" << ae << "hlen?(y/n)" << endl;
-				cin >> c;
-				//SoundFX spielen
-				Mix_PlayChannel(-1, click, 0);
-				c = tolower(c);
-				if (c == 'y') {
-					loadgame();
-				}
-				if (c == 'n') {
-					mainmenu();
-				}
-			} while (c != 'y' || c != 'n');
+			cout << "Bitte 1,2,3 oder 4 eingeben" << endl;
 		}
-	}
-	else {
-		cout << "Bitte 1,2,3 oder 4 eingeben" << endl;
 	}
 }
 
 void save() {
-	int i;
-	for (i = 3; saves[i].room != NULL; i--) {
-	}
-	savegame newsave;
-	newsave.room = raumnr;
-	newsave.delay = delay;
-	newsave.health = health;
-	newsave.potions = potions;
-
-	saves[i] = newsave;
 	FILE* datei;
-	if ((datei = fopen("save.bin", "w")) == NULL) {
-		fprintf(stderr, "Fehler bei der Dateioeffnung");
-		cout << "Fehler beim Speichern" << endl;
-	}
+	//Neues Laden der Speicherstände
+	loadgame(false);
+	//Spielstand-Info ausgeben
 	cout <<
 		R"foo(
 In welchem Slot willst du speichern?
-[1])foo" << Bred << saves[0].health << " Leben  " << yellow << saves[0].potions << " Heiltr" << ae << "nke  " << green << saves[0].room << " Raum  " << normal << R"foo(
-[2])foo" << Bred << saves[1].health << " Leben  " << yellow << saves[1].potions << " Heiltr" << ae << "nke  " << green << saves[1].room << " Raum  " << normal << R"foo(
-[3])foo" << Bred << saves[2].health << " Leben  " << yellow << saves[2].potions << " Heiltr" << ae << "nke  " << green << saves[2].room << " Raum  " << normal << R"foo(
+[1])foo" << green << saves[0].room << " Raum  " << Bred << saves[0].health << " Leben  " << yellow << saves[0].potions << " Heiltr" << ae << "nke  " << normal << R"foo(
+[2])foo" << green << saves[1].room << " Raum  " << Bred << saves[1].health << " Leben  " << yellow << saves[1].potions << " Heiltr" << ae << "nke  " << normal << R"foo(
+[3])foo" << green << saves[2].room << " Raum  " << Bred << saves[2].health << " Leben  " << yellow << saves[2].potions << " Heiltr" << ae << "nke  " << normal << R"foo(
 		)foo" << endl;
 	char answer;
 	cin >> answer;
 	//SoundFX spielen
 	Mix_Chunk *click = Mix_LoadWAV(keyclick);
 	Mix_PlayChannel(-1, click, 0);
-	answer = atoi(&answer);
-
-	switch (answer) {
-	case 1:fwrite(saves, sizeof(savegame), 1, datei);
-		break;
-	case 2: fseek(datei, sizeof(savegame), SEEK_SET); fwrite(saves, sizeof(savegame), 1, datei);
-		break;
-	case 3:fseek(datei, sizeof(savegame) * 2, SEEK_SET); fwrite(saves, sizeof(savegame), 1, datei);
-		break;
+	int i = atoi(&answer);
+	i--;
+	//Koopieren der Spieldaten
+	savegame newsave;
+	newsave.room = raumnr;
+	newsave.delay = delay;
+	newsave.health = health;
+	newsave.potions = potions;
+	saves[i] = newsave;
+	//Öffnen der Datei
+	if ((datei = fopen("save.bin", "wb")) == NULL) {
+		fprintf(stderr, "Fehler bei der Dateioeffnung");
+		cout << "Fehler beim Speichern" << endl;
 	}
-
-	fwrite(saves, sizeof(savegame), 1, datei);
+	//Schreiben der Datensätze in die Datei
+	fwrite(saves, sizeof(savegame), 3, datei);
 	cout << "Erfolgreich gespeichtert" << endl;
 	fclose(datei);
 }
@@ -666,7 +681,6 @@ void drawscreen(int locint, int imgint, int txtint, string info, bool txtswitch)
 			cout << text[i]; Sleep(delay);
 		}
 	}
-	//}
 	cout << info << R"foo(
 +---------------------------------------------------------------------------------------------------+)foo" << endl;
 }
@@ -711,6 +725,7 @@ void getimg(int imgint) {
 			strncat(image, newimg, imgsize - strlen(image) - 1);
 		}
 	}
+	//Schließen der Datei
 	fclose(datei);
 }
 
@@ -734,6 +749,7 @@ void gettxt(int txtint) {
 			strncat(text, newtxt, txtsize - strlen(text) - 1);
 		}
 	}
+	//Schließen der Datei
 	fclose(datei);
 }
 
@@ -880,9 +896,11 @@ void combat() {
 	int enemyhealth = gegnerleben;
 	int enemypotion = 3;
 	bool check = true;
+	//Zufällige Auswahl des Banditenbild
 	srand(time(NULL));
-	int graphic = (rand() % 4) - 1;
-	getimg(19 + graphic);
+	int graphic = (rand() % 5);
+	getimg(20 + graphic);
+	//Ausgabe des Kampfbildschirm
 	string answer;
 	while (true) {
 		check = false;
@@ -891,6 +909,7 @@ void combat() {
 			R"foo(
 +---------------------------------------------------------------------------------------------------+
                                           Bandit: )foo";
+		//Lebenswert und Farbe des Gegners
 		if (enemyhealth >= 66) {
 			cout << green;
 		}
@@ -906,7 +925,9 @@ void combat() {
  [2] Heilen
  [3] Fliehen
 
-)foo"; if (health >= 66) {
+)foo";
+		//Lebenswert und Farbe
+		if (health >= 66) {
 			cout << green;
 		}
 		if (health >= 33 && health < 66) {
@@ -918,12 +939,15 @@ void combat() {
 		cout << health << "HP" << normal << "     Potions:" << potions << R"foo(
 +---------------------------------------------------------------------------------------------------+)foo" << endl;
 
+		//Kampf-Abruchbedingung
 		if (health <= 0) {
 			gameover();
 		}
+		//Kampf-Siegbedingung
 		if (enemyhealth <= 0) {
 			system("cls");
 			cout << "Der Bandit wurde besiegt!" << endl;
+			//Zufällige Belohnung
 			if (rand() % 100 < 80) {
 				potions++;
 				cout << "Du sammelst 1 Heilungstrank ein" << endl;
@@ -942,6 +966,7 @@ void combat() {
 		Mix_Chunk *click = Mix_LoadWAV(keyclick);
 		Mix_PlayChannel(-1, click, 0);
 
+		//Angriff
 		if (answer == "1") {
 			enemyhealth = enemyhealth - rand() % 33;
 			check = true;
@@ -949,6 +974,7 @@ void combat() {
 			cout << "Du greifst an" << endl;
 		}
 		else {
+			//Heilung
 			if (answer == "2") {
 				if (potions != 0) {
 					potions--;
@@ -962,12 +988,14 @@ void combat() {
 				}
 			}
 			else {
+				//Fliehen
 				if (answer == "3") {
 					cout << endl;
 					cout << "Diese Welt ist nichts f" << ue << "r Weicheier!" << endl;
 					check = true;
 				}
 				else {
+					//Falsche Eingabe
 					if (answer.length() != NULL) {
 						cout << endl;
 						cout << "Bitte 1,2 oder 3 w" << ae << "hlen" << endl;
@@ -1006,7 +1034,7 @@ geradeaus
 norden
 nord
 gerade
-tür
+t)foo"<<ue<<R"foo(r
 door
 front
 
@@ -1036,6 +1064,7 @@ commands
 info
 )foo";
 }
+
 void settings() {
 	system("cls");
 	cout <<
@@ -1053,7 +1082,7 @@ Einstellungen:
 	Mix_Chunk *click = Mix_LoadWAV(keyclick);
 	Mix_PlayChannel(-1, click, 0);
 	answer = atoi(&answer);
-
+	//Text-Einstellungen
 	switch (answer) {
 	case 1:
 		system("cls");
@@ -1090,6 +1119,7 @@ Textgeschwindigkeit:
 		}
 		break;
 	case 2:
+		//Schwierigkeits-Einstellungen
 		system("cls");
 		cout <<
 			R"foo(
@@ -1121,6 +1151,7 @@ Schwierigkeit:
 		}
 		break;
 	case 3:
+		//Audio-Einstellungen
 		system("cls");
 		cout <<
 			R"foo(
@@ -1215,14 +1246,17 @@ void dev() {
 		answer = atoi(&answer);
 		switch (answer) {
 		case 1:
+			//Teleport-Funktion
 			cout << "In welchen Raum gehen?(0-18)" << endl;
 			int answerdev;
 			cin >> answerdev;
 			raumnr = answerdev;
 			startgame();
 			break;
-		case 2:loadgame();
+			//Spiel laden
+		case 2:loadgame(true);
 			break;
+			//Einstellungen
 		case 3:settings();
 			break;
 		}

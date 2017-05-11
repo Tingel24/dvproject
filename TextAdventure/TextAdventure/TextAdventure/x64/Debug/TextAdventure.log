@@ -1,6 +1,6 @@
 ﻿  TextAdventure.cpp
-c:\users\luca\source\repos\dvproject\textadventure\textadventure\textadventure\textadventure.cpp(402): warning C4244: "Argument": Konvertierung von "time_t" in "unsigned int", möglicher Datenverlust
-c:\users\luca\source\repos\dvproject\textadventure\textadventure\textadventure\textadventure.cpp(432): warning C4244: "Argument": Konvertierung von "time_t" in "unsigned int", möglicher Datenverlust
-c:\users\luca\source\repos\dvproject\textadventure\textadventure\textadventure\textadventure.cpp(883): warning C4244: "Argument": Konvertierung von "time_t" in "unsigned int", möglicher Datenverlust
+c:\users\luca\source\repos\dvproject\textadventure\textadventure\textadventure\textadventure.cpp(405): warning C4244: "Argument": Konvertierung von "time_t" in "unsigned int", möglicher Datenverlust
+c:\users\luca\source\repos\dvproject\textadventure\textadventure\textadventure\textadventure.cpp(440): warning C4244: "Argument": Konvertierung von "time_t" in "unsigned int", möglicher Datenverlust
+c:\users\luca\source\repos\dvproject\textadventure\textadventure\textadventure\textadventure.cpp(900): warning C4244: "Argument": Konvertierung von "time_t" in "unsigned int", möglicher Datenverlust
   TextAdventure.vcxproj -> C:\Users\Luca\Source\Repos\dvproject\TextAdventure\TextAdventure\x64\Debug\TextAdventure.exe
   TextAdventure.vcxproj -> C:\Users\Luca\Source\Repos\dvproject\TextAdventure\TextAdventure\x64\Debug\TextAdventure.pdb (Partial PDB)
