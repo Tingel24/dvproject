@@ -77,6 +77,7 @@ static const char *combatmusic = "..\\Music\\Visager2\\Visager_-_22_-_Battle_Loo
 static const char *titletheme = "..\\Music\\Visager\\TitleTheme.mp3";
 static const char *keyclick = "..\\Music\\click.wav";
 static const char *door = "..\\Music\\door.wav";
+static const char *punch = "..\\Music\\punch.wav";
 Mix_Music *music = NULL;
 Mix_Chunk *click = NULL;
 
@@ -438,8 +439,8 @@ void startgame() {
 		}
 		//Zufälliger Kampf
 		srand(time(NULL));
-		//10% Chance,keine zwei Kämpfe im selben Raum, kein Kampf im ersten Raum
-		if (rand() % 100 < 10 && raumnrcheck != raumnr&&raumnr != 1) {
+		//15% Chance,keine zwei Kämpfe im selben Raum, kein Kampf im ersten Raum
+		if (rand() % 100 < 15 && raumnrcheck != raumnr&&raumnr != 1) {
 			Sleep(1000);
 			system("cls");
 			raumnrcheck = raumnr;
@@ -480,7 +481,7 @@ void startgame() {
 			check = false;
 		}
 		//Zurück ins Hauptmenu
-		if (answer == "exit" || answer == "mainmenu" || answer == "menu") {
+		if (answer == "exit" || answer == "mainmenu" || answer == "menu" || answer == "hauptmenu") {
 			mainmenu();
 			check = false;
 		}
@@ -898,7 +899,7 @@ void combat() {
 	bool check = true;
 	//Zufällige Auswahl des Banditenbild
 	srand(time(NULL));
-	int graphic = (rand() % 5);
+	int graphic = (rand() % 4);
 	getimg(20 + graphic);
 	//Ausgabe des Kampfbildschirm
 	string answer;
@@ -972,6 +973,9 @@ void combat() {
 			check = true;
 			cout << endl;
 			cout << "Du greifst an" << endl;
+			//SoundFX spielen
+			Mix_Chunk *hit = Mix_LoadWAV(punch);
+			Mix_PlayChannel(-1, hit, 0);
 		}
 		else {
 			//Heilung
@@ -1025,43 +1029,31 @@ void help() {
 	cout << "M" << oe << "gliche Kommandos sind:" << endl;
 	cout <<
 		R"foo(
-Bewegung:
-geh
-gehe
-go
-lauf
+)foo" << Bred << R"foo(Bewegung:           Hauptmenu:)foo" << normal << R"foo(
+geh                 menu
+gehe                hauptmenu
+go                  exit
+lauf                mainmenu
 geradeaus
 norden
 nord
 gerade
-t)foo"<<ue<<R"foo(r
+t)foo" << ue << R"foo(r
 door
 front
 
-Speichern:
-save
-speichern
-speicher
+)foo" << Bred << R"foo(Speichern:          Umgebung:)foo" << normal << R"foo(
+save                look
+speichern           guck
+speicher            schau
+                    seh
 
-Umgebung:
-look
-guck
-schau
-seh
-
-Heilung:
-heilung
-trank
-heiltrank
-potion
+)foo" << Bred << R"foo(Heilung:            Hilfe:)foo" << normal << R"foo(
+heilung             help
+trank               hilfe
+heiltrank           commands
+potion              info
 potions
-
-Hilfe:
-help
-hilfe
-commands
-?
-info
 )foo";
 }
 
@@ -1188,7 +1180,7 @@ Im Moment ist )foo" << Mix_VolumeMusic(-1) << R"foo( eingestellt)foo" << endl;
 			system("cls");
 			cout <<
 				R"foo(
-Musik:
+Musik: (Um auch Kampfmusik auszustellen, Lautstärke auf 0 setzen!)
 [1] AUS
 [2] AN
 )foo";
@@ -1223,6 +1215,9 @@ void listitems() {
 	if (raumnr == 10) {
 		list += " und einen Schrank";
 	}
+	if (raumnr == 18) {
+		list += " und eine Leiter";
+	}
 	drawscreen(raumnr, raumnr, raumnr, list, 0);
 }
 
@@ -1233,8 +1228,9 @@ void dev() {
    *--------------------*
    | DeveloperMenu      |
    | [1] Teleport       |
-   | [2] Spiel laden    |
-   | [3] Einstellungen  |
+   | [2] Kampfsimulation|
+   | [3] Spiel laden    |
+   | [4] Einstellungen  |
    *--------------------*
 )foo" << endl;
 		//Einlesen der Antwort
@@ -1253,11 +1249,14 @@ void dev() {
 			raumnr = answerdev;
 			startgame();
 			break;
+			//Kampfsimulation
+		case 2:combat();
+			break;
 			//Spiel laden
-		case 2:loadgame(true);
+		case 3:loadgame(true);
 			break;
 			//Einstellungen
-		case 3:settings();
+		case 4:settings();
 			break;
 		}
 	}
@@ -1276,7 +1275,29 @@ void gameover() {
  | |  __  __ _ _ __ ___   ___  | |  | |_   _____ _ __
  | | |_ |/ _` | '_ ` _ \ / _ \ | |  | \ \ / / _ \ '__|
  | |__| | (_| | | | | | |  __/ | |__| |\ V /  __/ |
-  \_____|\__,_|_| |_| |_|\___|  \____/  \_/ \___|_|   )foo";
+  \_____|\__,_|_| |_| |_|\___|  \____/  \_/ \___|_|
+               ...
+             ;::::;
+           ;::::; :;
+         ;:::::'   :;
+        ;:::::;     ;.
+       ,:::::'       ;           OOO\
+       ::::::;       ;          OOOOO\
+       ;:::::;       ;         OOOOOOOO
+      ,;::::::;     ;'         / OOOOOOO
+    ;:::::::::`. ,,,;.        /  / DOOOOOO
+  .';:::::::::::::::::;,     /  /     DOOOO
+ ,::::::;::::::;;;;::::;,   /  /        DOOO
+;`::::::`'::::::;;;::::: ,#/  /          DOOO
+:`:::::::`;::::::;;::: ;::#  /            DOOO
+::`:::::::`;:::::::: ;::::# /             DOO
+`:`:::::::`;:::::: ;::::::#/               OO
+ :::`:::::::`;; ;:::::::::##               OO
+ ::::`:::::::`;::::::::;:::#               OO
+ `:::::`::::::::::::;'`:;::#               O
+  `:::::`::::::::;' /  / `:#
+   ::::::`:::::;'  /  /   `#
+)foo";
 		Sleep(100);
 		system("CLS");
 		cout <<
@@ -1286,7 +1307,29 @@ void gameover() {
  | |  __  __ _ _ __ ___   ___  | |  | |_   _____ _ __
  | | |_ |/ _` | '_ ` _ \ / _ \ | |  | \ \ / / _ \ '__|
  | |__| | (_| | | | | | |  __/ | |__| |\ V /  __/ |
-  \_____|\__,_|_| |_| |_|\___|  \____/  \_/ \___|_|   )foo";
+  \_____|\__,_|_| |_| |_|\___|  \____/  \_/ \___|_|
+               ...
+             ;::::;
+           ;::::; :;
+         ;:::::'   :;
+        ;:::::;     ;.
+       ,:::::'       ;           OOO\
+       ::::::;       ;          OOOOO\
+       ;:::::;       ;         OOOOOOOO
+      ,;::::::;     ;'         / OOOOOOO
+    ;:::::::::`. ,,,;.        /  / DOOOOOO
+  .';:::::::::::::::::;,     /  /     DOOOO
+ ,::::::;::::::;;;;::::;,   /  /        DOOO
+;`::::::`'::::::;;;::::: ,#/  /          DOOO
+:`:::::::`;::::::;;::: ;::#  /            DOOO
+::`:::::::`;:::::::: ;::::# /              DOO
+`:`:::::::`;:::::: ;::::::#/               DOO
+ :::`:::::::`;; ;:::::::::##                OO
+ ::::`:::::::`;::::::::;:::#                OO
+ `:::::`::::::::::::;'`:;::#                O
+  `:::::`::::::::;' /  / `:#
+   ::::::`:::::;'  /  /   `#
+)foo";
 		Sleep(100);
 		system("CLS");
 		cout <<
@@ -1296,7 +1339,29 @@ void gameover() {
  | |  __  __ _ _ __ ___   ___  | |  | |_   _____ _ __
  | | |_ |/ _` | '_ ` _ \ / _ \ | |  | \ \ / / _ \ '__|
  | |__| | (_| | | | | | |  __/ | |__| |\ V /  __/ |
-  \_____|\__,_|_| |_| |_|\___|  \____/  \_/ \___|_|   )foo";
+  \_____|\__,_|_| |_| |_|\___|  \____/  \_/ \___|_|
+               ...
+             ;::::;
+           ;::::; :;
+         ;:::::'   :;
+        ;:::::;     ;.
+       ,:::::'       ;           OOO\
+       ::::::;       ;          OOOOO\
+       ;:::::;       ;         OOOOOOOO
+      ,;::::::;     ;'         / OOOOOOO
+    ;:::::::::`. ,,,;.        /  / DOOOOOO
+  .';:::::::::::::::::;,     /  /     DOOOO
+ ,::::::;::::::;;;;::::;,   /  /        DOOO
+;`::::::`'::::::;;;::::: ,#/  /          DOOO
+:`:::::::`;::::::;;::: ;::#  /            DOOO
+::`:::::::`;:::::::: ;::::# /             DOO
+`:`:::::::`;:::::: ;::::::#/               OO
+ :::`:::::::`;; ;:::::::::##               OO
+ ::::`:::::::`;::::::::;:::#               OO
+ `:::::`::::::::::::;'`:;::#               O
+  `:::::`::::::::;' /  / `:#
+   ::::::`:::::;'  /  /   `#
+)foo";
 		Sleep(100);
 		system("CLS");
 		cout <<
@@ -1306,7 +1371,29 @@ void gameover() {
   | |  __  __ _ _ __ ___   ___  | |  | |_   _____ _ __
  | | |_ |/ _` | '_ ` _ \ / _ \ | |  | \ \ / / _ \ '__|
  | |__| | (_| | | | | | |  __/ | |__| |\ V /  __/ |
-  \_____|\__,_|_| |_| |_|\___|  \____/  \_/ \___|_|   )foo";
+  \_____|\__,_|_| |_| |_|\___|  \____/  \_/ \___|_|
+               ...
+             ;::::;
+           ;::::; :;
+         ;:::::'   :;
+        ;:::::;     ;.
+       ,:::::'       ;           OOO\
+       ::::::;       ;          OOOOO\
+       ;:::::;       ;         OOOOOOOO
+      ,;::::::;     ;'         / OOOOOOO
+    ;:::::::::`. ,,,;.        /  / DOOOOOO
+  .';:::::::::::::::::;,     /  /     DOOOO
+ ,::::::;::::::;;;;::::;,   /  /        DOOO
+;`::::::`'::::::;;;::::: ,#/  /          DOOO
+:`:::::::`;::::::;;::: ;::#  /            DOOO
+::`:::::::`;:::::::: ;::::# /              DOO
+`:`:::::::`;:::::: ;::::::#/               DOO
+ :::`:::::::`;; ;:::::::::##                OO
+ ::::`:::::::`;::::::::;:::#                OO
+ `:::::`::::::::::::;'`:;::#                O
+  `:::::`::::::::;' /  / `:#
+   ::::::`:::::;'  /  /   `#
+)foo";
 		Sleep(100);
 		system("CLS");
 		cout <<
@@ -1316,7 +1403,28 @@ void gameover() {
  | |  __  __ _ _ __ ___   ___  | |  | |_   _____ _ __
   | | |_ |/ _` | '_ ` _ \ / _ \ | |  | \ \ / / _ \ '__|
  | |__| | (_| | | | | | |  __/ | |__| |\ V /  __/ |
-  \_____|\__,_|_| |_| |_|\___|  \____/  \_/ \___|_|   )foo";
+  \_____|\__,_|_| |_| |_|\___|  \____/  \_/ \___|_|
+               ...
+             ;::::;
+           ;::::; :;
+         ;:::::'   :;
+        ;:::::;     ;.
+       ,:::::'       ;           OOO\
+       ::::::;       ;          OOOOO\
+       ;:::::;       ;         OOOOOOOO
+      ,;::::::;     ;'         / OOOOOOO
+    ;:::::::::`. ,,,;.        /  / DOOOOOO
+  .';:::::::::::::::::;,     /  /     DOOOO
+ ,::::::;::::::;;;;::::;,   /  /        DOOO
+;`::::::`'::::::;;;::::: ,#/  /          DOOO
+:`:::::::`;::::::;;::: ;::#  /            DOOO
+::`:::::::`;:::::::: ;::::# /             DOO
+`:`:::::::`;:::::: ;::::::#/               OO
+ :::`:::::::`;; ;:::::::::##               OO
+ ::::`:::::::`;::::::::;:::#               OO
+ `:::::`::::::::::::;'`:;::#               O
+  `:::::`::::::::;' /  / `:#
+   ::::::`:::::;'  /  /   `#)foo";
 		Sleep(100);
 		system("CLS");
 		cout <<
@@ -1326,17 +1434,96 @@ void gameover() {
  | |  __  __ _ _ __ ___   ___  | |  | |_   _____ _ __
  | | |_ |/ _` | '_ ` _ \ / _ \ | |  | \ \ / / _ \ '__|
   | |__| | (_| | | | | | |  __/ | |__| |\ V /  __/ |
-  \_____|\__,_|_| |_| |_|\___|  \____/  \_/ \___|_|   )foo";
+  \_____|\__,_|_| |_| |_|\___|  \____/  \_/ \___|_|
+               ...
+             ;::::;
+           ;::::; :;
+         ;:::::'   :;
+        ;:::::;     ;.
+       ,:::::'       ;           OOO\
+       ::::::;       ;          OOOOO\
+       ;:::::;       ;         OOOOOOOO
+      ,;::::::;     ;'         / OOOOOOO
+    ;:::::::::`. ,,,;.        /  / DOOOOOO
+  .';:::::::::::::::::;,     /  /     DOOOO
+ ,::::::;::::::;;;;::::;,   /  /        DOOO
+;`::::::`'::::::;;;::::: ,#/  /          DOOO
+:`:::::::`;::::::;;::: ;::#  /            DOOO
+::`:::::::`;:::::::: ;::::# /              DOO
+`:`:::::::`;:::::: ;::::::#/               DOO
+ :::`:::::::`;; ;:::::::::##                OO
+ ::::`:::::::`;::::::::;:::#                OO
+ `:::::`::::::::::::;'`:;::#                O
+  `:::::`::::::::;' /  / `:#
+   ::::::`:::::;'  /  /   `#
+)foo";
 		Sleep(100);
 		system("CLS");
-		cout <<
-			R"foo(
+		srand(time(NULL));
+		if ((rand() % 100) < 5) {
+			cout <<
+				R"foo(
    _____                         ____
   / ____|                       / __ \
  | |  __  __ _ _ __ ___   ___  | |  | |_   _____ _ __
  | | |_ |/ _` | '_ ` _ \ / _ \ | |  | \ \ / / _ \ '__|
  | |__| | (_| | | | | | |  __/ | |__| |\ V /  __/ |
-   \_____|\__,_|_| |_| |_|\___|  \____/  \_/ \___|_|   )foo";
+   \_____|\__,_|_| |_| |_|\___|  \____/  \_/ \___|_|
+               ...
+             ;::::;
+           ;::::; :;
+         ;:::::'   :;
+        ;:::::;     ;.
+       ,:::::' 0   0 ;           OOO\
+       ::::::;   <   ;          OOOOO\
+       ;:::::; -___- ;         OOOOOOOO
+      ,;::::::;     ;'         / OOOOOOO
+    ;:::::::::`. ,,,;.        /  / DOOOOOO
+  .';:::::::::::::::::;,     /  /     DOOOO
+ ,::::::;::::::;;;;::::;,   /  /        DOOO
+;`::::::`'::::::;;;::::: ,#/  /          DOOO
+:`:::::::`;::::::;;::: ;::#  /            DOOO
+::`:::::::`;:::::::: ;::::# /             DOO
+`:`:::::::`;:::::: ;::::::#/               OO
+ :::`:::::::`;; ;:::::::::##               OO
+ ::::`:::::::`;::::::::;:::#               OO
+ `:::::`::::::::::::;'`:;::#               O
+  `:::::`::::::::;' /  / `:#
+   ::::::`:::::;'  /  /   `#
+)foo";
+		}
+		else {
+			cout <<
+				R"foo(
+   _____                         ____
+  / ____|                       / __ \
+ | |  __  __ _ _ __ ___   ___  | |  | |_   _____ _ __
+ | | |_ |/ _` | '_ ` _ \ / _ \ | |  | \ \ / / _ \ '__|
+ | |__| | (_| | | | | | |  __/ | |__| |\ V /  __/ |
+   \_____|\__,_|_| |_| |_|\___|  \____/  \_/ \___|_|
+               ...
+             ;::::;
+           ;::::; :;
+         ;:::::'   :;
+        ;:::::;     ;.
+       ,:::::'       ;           OOO\
+       ::::::;       ;          OOOOO\
+       ;:::::;       ;         OOOOOOOO
+      ,;::::::;     ;'         / OOOOOOO
+    ;:::::::::`. ,,,;.        /  / DOOOOOO
+  .';:::::::::::::::::;,     /  /     DOOOO
+ ,::::::;::::::;;;;::::;,   /  /        DOOO
+;`::::::`'::::::;;;::::: ,#/  /          DOOO
+:`:::::::`;::::::;;::: ;::#  /            DOOO
+::`:::::::`;:::::::: ;::::# /             DOO
+`:`:::::::`;:::::: ;::::::#/               OO
+ :::`:::::::`;; ;:::::::::##               OO
+ ::::`:::::::`;::::::::;:::#               OO
+ `:::::`::::::::::::;'`:;::#               O
+  `:::::`::::::::;' /  / `:#
+   ::::::`:::::;'  /  /   `#
+)foo";
+		}
 		Sleep(100);
 		system("CLS");
 	}
