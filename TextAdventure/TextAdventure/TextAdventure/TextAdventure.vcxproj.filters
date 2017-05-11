@@ -371,5 +371,9 @@
     <None Include="@(NativeLibs)" />
     <None Include="@(NativeLibs)" />
     <None Include="@(NativeLibs)" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="FodyWeavers.xml" />
   </ItemGroup>
 </Project>

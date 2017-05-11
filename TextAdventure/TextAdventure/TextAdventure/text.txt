@@ -1,4 +1,15 @@
-Hallo
+Ich oeffne meine Augen, die Fackeln an den Wenden blenden mich, mein Schaedel droehnt unbeschreiblich und ich habe Schmerzen am ganzen Koerper. Das Letzte, an das ich mich erinnern kann ist, wie 2 Maenner auf mich zurennen und mich von meinem Pferd reissen. Es ist kalt und nass hier, ich stehe auf und schaue mich um. In dem Raum befindet sich nur eine massive Holztuer. Warum hat man mich hier zurueckgelassen?
 end
-Witz
+Ich schleppe mich muehsam und schwerfaellig durch die Tuer. Es ist ebenfalls ein karger, leerer und fester Raum wie davor. Es gibt wieder nur eine Tuer, ich muss den Weg nach drauﬂen finden. Hoffentlich bin ich hier alleine.
 end
+Im naechsten Raum steht einen alte vermoderte Kiste in der Mitte des Raumes. Sie oeffnet sich mit einem lautem Knarzen, drinnen liegt ein seltsamer Trank. Ich sollte ihn mitnehmen. Jetzt faellt mir erst auf, das mein gesamtes Geld und mein Schmuck weg ist. Ich wurde also ausgeraubt und hierher verschleppt, aber was wollen sie jetzt noch von mir ?
+end
+In diesem Raum steht einzig und alleine ein gedeckter Tisch, es sieht so aus, als ob hier jemand wohnen wuerden. Im Gegensatz zu den anderen Raeumen ist dieser Raum sauber und ordentlich. Auf dem Tisch stehen auﬂerdem noch 3 komisch aussehende Flaschen, ich stecke sie in meine Tasche. Sonst ist in dem Raum nichts von Bedeutung.
+end
+Ich hoerte sofort Stimmen, welche aus dem Nachbarraum zu mir vordringen. Es sind 2 Maenner, welche sich anscheinend gerade lautstark streiten. Es wird still, ich hoere nur noch wie eine Tuer nebenan zugeschlagen wird. Ich bin mir nicht sicher ob ich in den naechsten Raum gehen will.
+end
+Das Einzige in diesem Raum ist ein orientalisch aussehender Teppich, er muss wohl gestohlen sein. Langsam frage ich mich, um was fuer ein eigenartiges Haus es sich handelt, oder vielleicht bin ich sogar in einer altem Villa oder einem Schloss.
+end
+
+
+Ich erkenne eine Leiter, die durch eine Falltuer nach oben fuehrt. Licht scheint durch die Ritzen der Bretter. Ich entscheide mich dhinaufzuklettern und erkenne schnell, das die Oeffnung mich nach drauﬂen bringt. Ehe ich mich versehe stehe ich an der frischen Luft ud renne so schnell mich meine Beine tragen koennen. Da bin ich wohl doch nochmal davongekommen!

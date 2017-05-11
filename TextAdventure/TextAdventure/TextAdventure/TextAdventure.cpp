@@ -22,7 +22,7 @@ void mainmenu();
 void startgame();
 void loadgame();
 void save();
-void drawscreen(int, int, int, string);
+void drawscreen(int, int, int, string, bool);
 void getloc(int);
 void getimg(int);
 void gettxt(int);
@@ -35,6 +35,7 @@ void listitems();
 void wingame();
 void help();
 void settings();
+void dev();
 
 //Spielstand-Struktur
 struct savegame {
@@ -47,13 +48,13 @@ savegame saves[3];
 
 //Globale Variabeln:
 //Textgeschwindigkeit
-int delay = 50;
+int delay = 30;
 //Lebensvariabel
 int health = 100;
 //Lebensvariabel der Gegner
 int gegnerleben = 100;
 //Heilngsitems
-int potions = 3;
+int potions = 1;
 //Raumnummer
 int raumnr = 1;
 
@@ -66,15 +67,16 @@ char location[locsize];
 char text[txtsize];
 
 //Musik-Pfade:
-static const char *winmus = "..\\Music\\Visager2\\Visager_-_02_-_Royal_Entrance.mp3";
+static const char *winmus = "..\\Music\\Visager2\\Visager_-_02_-_Royal_Entrance_Loop.mp3";
 static const char *gameovermus = "..\\Music\\Visager2\\Visager_-_23_-_Haunted_Forest_Loop.mp3";
-static const char *mausoleum = "..\\Music\\Visager2\\Visager_-_11_-_Eerie_Mausoleum.mp3";
-static const char *icecave = "..\\Music\\Visager\\Visager_-_07_-_Ice_Cave.mp3";
-static const char *throne = "..\\Music\\Visager2\\Visager_-_03_-_Throne_Room.mp3";
+static const char *mausoleum = "..\\Music\\Visager2\\Visager_-_11_-_Eerie_Mausoleum_Loop.mp3";
+static const char *icecave = "..\\Music\\Visager\\Visager_-_07_-_Ice_Cave_Loop.mp3";
+static const char *throne = "..\\Music\\Visager2\\Visager_-_03_-_Throne_Room_Loop.mp3";
 static const char *combatintromusic = "..\\Music\\Visager2\\Visager_-_21_-_Battle_Intro.mp3";
 static const char *combatmusic = "..\\Music\\Visager2\\Visager_-_22_-_Battle_Loop.mp3";
 static const char *titletheme = "..\\Music\\Visager\\TitleTheme.mp3";
 static const char *keyclick = "..\\Music\\click.wav";
+static const char *door = "..\\Music\\door.wav";
 Mix_Music *music = NULL;
 Mix_Chunk *click = NULL;
 
@@ -126,13 +128,16 @@ void testscreen() {
 |                                                                                                               |
 |                                                                                                               |
 |                                                                                                               |
+|                                           /|\    /|\    /|\                                                   |
+|                                            |      |      |                                                    |
 |                                                                                                               |
+|                                     Passe das Konsolenfenster so an,                                          |
+|                                  das der komplette Kasten zu sehen ist!                                       |
+|                                      Nur dann funktioniert alles                                              |
+|                               Veraendere das Fenster hiernach nichtmehr!                                      |
 |                                                                                                               |
-|                                                                                                               |
-|                                      Resize to show complete box                                              |
-|                                       for game to work correctly                                              |
-|                                                                                                               |
-|                                        dont resize after this!                                                |
+|                                            |      |      |                                                    |
+|                                           \|/    \|/    \|/                                                   |
 |                                                                                                               |
 |                                                                                                               |
 |                                                                                                               |
@@ -364,6 +369,7 @@ void mainmenu() {
    | [1] Neues Spiel    |
    | [2] Spiel laden    |
    | [3] Einstellungen  |
+   | [4] Exit           |
    *--------------------*
 )foo" << endl;
 		//Einlesen der Antwort
@@ -382,15 +388,16 @@ void mainmenu() {
 			break;
 		case 3:settings();
 			break;
+		case 4:
+			FreeConsole();
+			break;
+		case 5:dev();
+			break;
 		}
 	}
 }
 
 void startgame() {
-	if (raumnr == 19) {
-		wingame();
-	}
-	room(raumnr);
 	//Starten der Hintergrundmusik
 	srand(time(NULL));
 	int musicchoice = rand() % 100;
@@ -407,12 +414,24 @@ void startgame() {
 		Mix_PlayMusic(music, -1);
 	}
 
+	room(raumnr);
+
 	string answer;
 	int raumnrcheck = 0;
 	bool check = false;
 	while (true) {
+		if (raumnr == 19) {
+			wingame();
+		}
+		if (raumnr == 3) {
+			potions++;
+		}
+		if (raumnr == 4) {
+			potions = potions + 3;
+		}
 		srand(time(NULL));
 		if (rand() % 100 < 10 && raumnrcheck != raumnr&&raumnr != 1) {
+			Sleep(1000);
 			system("cls");
 			raumnrcheck = raumnr;
 			cout << "Ein Bandit greift an!" << endl;
@@ -427,13 +446,16 @@ void startgame() {
 		Mix_PlayChannel(-1, click, 0);
 
 		if (answer == "geh" || answer == "gehe" || answer == "go" || answer == "lauf" || answer == "geradeaus" || answer == "norden" || answer == "nord" || answer == "gerade" || answer == "tür" || answer == "door" || answer == "front") {
-			drawscreen(raumnr, raumnr, raumnr, "Willst du in den naechsten Raum gehen? (y/n)");
+			drawscreen(raumnr, raumnr, raumnr, "Willst du in den naechsten Raum gehen? (y/n)", 0);
 			memset(&answer[0], 0, 10);
 			cin >> answer;
 			answer = tolower(answer[0]);
 			if (answer == "y") {
 				raumnr++;
-				drawscreen(raumnr, raumnr, raumnr, " ");
+				//SoundFX spielen
+				Mix_Chunk *doorsfx = Mix_LoadWAV(door);
+				Mix_PlayChannel(-1, doorsfx, 0);
+				drawscreen(raumnr, raumnr, raumnr, " ", 1);
 				check = false;
 			}
 		}
@@ -445,13 +467,23 @@ void startgame() {
 			listitems();
 			check = false;
 		}
+		if (answer == "exit" || answer == "mainmenu" || answer == "menu") {
+			mainmenu();
+		}
 		if (answer == "heilung" || answer == "trank" || answer == "heiltrank" || answer == "potion" || answer == "potions") {
 			if (potions != 0) {
-				potions--;
-				health = health + (rand() % 50) + 10;
 				cout << endl;
-				cout << "Du heilst dich" << endl;
 				cout << "Du hast noch " << potions << ". Heiltr" << ae << "nke" << endl;
+				cout << "Willst du dich heilen? (y/n)" << endl;
+				memset(&answer[0], 0, 10);
+				cin >> answer;
+				answer = tolower(answer[0]);
+				if (answer == "y") {
+					potions--;
+					health = health + (rand() % 50) + 10;
+					cout << "Du heilst dich" << endl;
+					cout << "Leben: " << health << endl;
+				}
 				check = false;
 			}
 			else {
@@ -466,7 +498,7 @@ void startgame() {
 
 		if (answer == "settings" || answer == "einstellungen" || answer == "einstellung") {
 			settings();
-			room(raumnr);
+			drawscreen(raumnr, raumnr, raumnr, "", 0);
 			check = false;
 		}
 
@@ -499,38 +531,44 @@ Welchen Spielstand m)foo" << oe << R"foo(chtest du laden?
 [1])foo" << Bred << saves[0].health << " Leben  " << yellow << saves[0].potions << " Heiltr" << ae << "nke  " << green << saves[0].room << " Raum  " << normal << R"foo(
 [2])foo" << Bred << saves[1].health << " Leben  " << yellow << saves[1].potions << " Heiltr" << ae << "nke  " << green << saves[1].room << " Raum  " << normal << R"foo(
 [3])foo" << Bred << saves[2].health << " Leben  " << yellow << saves[2].potions << " Heiltr" << ae << "nke  " << green << saves[2].room << " Raum  " << normal << R"foo(
+[4] Exit
 )foo" << endl;
 	char answer;
 	int n;
 	cin >> answer;
-	//SoundFX spielen
-	Mix_Chunk *click = Mix_LoadWAV(keyclick);
-	Mix_PlayChannel(-1, click, 0);
-	answer = atoi(&answer);
-	n = answer;
-	if (saves[n].room != NULL) {
-		delay = saves[n].delay;
-		health = saves[n].health;
-		raumnr = saves[n].room;
-		potions = saves[n].potions;
-		startgame();
+	if (answer == '1' || answer == '2' || answer == '3') {
+		//SoundFX spielen
+		Mix_Chunk *click = Mix_LoadWAV(keyclick);
+		Mix_PlayChannel(-1, click, 0);
+		answer = atoi(&answer);
+		n = answer;
+		if (saves[n].room != NULL) {
+			delay = saves[n].delay;
+			health = saves[n].health;
+			raumnr = saves[n].room;
+			potions = saves[n].potions;
+			startgame();
+		}
+		else {
+			cout << "Dieser Spielstand ist leer" << endl;
+			char c;
+			do {
+				cout << "Einen anderen w" << ae << "hlen?(y/n)" << endl;
+				cin >> c;
+				//SoundFX spielen
+				Mix_PlayChannel(-1, click, 0);
+				c = tolower(c);
+				if (c == 'y') {
+					loadgame();
+				}
+				if (c == 'n') {
+					mainmenu();
+				}
+			} while (c != 'y' || c != 'n');
+		}
 	}
 	else {
-		cout << "Dieser Spielstand ist leer" << endl;
-		char c;
-		do {
-			cout << "Einen anderen w" << ae << "hlen?(y/n)" << endl;
-			cin >> c;
-			//SoundFX spielen
-			Mix_PlayChannel(-1, click, 0);
-			c = tolower(c);
-			if (c == 'y') {
-				loadgame();
-			}
-			if (c == 'n') {
-				mainmenu();
-			}
-		} while (c != 'y' || c != 'n');
+		cout << "Bitte 1,2,3 oder 4 eingeben" << endl;
 	}
 }
 
@@ -600,7 +638,7 @@ void init() {
 	//Audiolautstärke
 	Mix_VolumeMusic(30);
 }
-void drawscreen(int locint, int imgint, int txtint, string info) {
+void drawscreen(int locint, int imgint, int txtint, string info, bool txtswitch) {
 	system("CLS");
 	//Modulares system um gleiche Assets mehrmals zu benutzen
 	getloc(locint);
@@ -611,13 +649,25 @@ void drawscreen(int locint, int imgint, int txtint, string info) {
 +---------------------------------------------------------------------------------------------------+
                                  )foo" << location << R"foo(
 +---------------------------------------------------------------------------------------------------+
-)foo"; if (info.length() != NULL) {
+)foo";// if (info.length() != NULL) {
+	if (txtswitch) {
 		for (int i = 0; text[i] != NULL; i++) {
+			if (!(i % 98)) {
+				if (i > 10) {
+					for (i; text[i] != NULL; i++) {
+						cout << text[i]; Sleep(delay);
+						if (text[i] == ' ') {
+							cout << endl;
+							break;
+						}
+					}
+				}
+			}
 			cout << text[i]; Sleep(delay);
 		}
 	}
+	//}
 	cout << info << R"foo(
-
 +---------------------------------------------------------------------------------------------------+)foo" << endl;
 }
 
@@ -689,7 +739,7 @@ void gettxt(int txtint) {
 
 void room(int n) {
 	//Schnelles Aufrufen der drawscreen-Funktion
-	drawscreen(n, n, n, " ");
+	drawscreen(n, n, n, " ", 1);
 }
 
 void combatintro() {
@@ -832,7 +882,7 @@ void combat() {
 	bool check = true;
 	srand(time(NULL));
 	int graphic = (rand() % 4) - 1;
-	getimg(20 + graphic);
+	getimg(19 + graphic);
 	string answer;
 	while (true) {
 		check = false;
@@ -934,7 +984,7 @@ void combat() {
 				cout << endl;
 			}
 			else {
-				health = health - rand() % 33;;
+				health = health - rand() % 22;;
 				cout << "Der Bandit greift an" << endl;
 				cout << endl;
 			}
@@ -1023,13 +1073,13 @@ Textgeschwindigkeit:
 		answertxt = atoi(&answertxt);
 
 		switch (answertxt) {
-		case 1: delay = 100;
+		case 1: delay = 75;
 			cout << "Textgeschwindigkeit = Langsam" << endl;
 			break;
-		case 2: delay = 50;
+		case 2: delay = 30;
 			cout << "Textgeschwindigkeit = Normal" << endl;
 			break;
-		case 3:delay = 25;
+		case 3:delay = 15;
 			cout << "Textgeschwindigkeit = Schnell" << endl;
 			break;
 		case 4:delay = 1;
@@ -1129,10 +1179,54 @@ Musik:
 
 void listitems() {
 	string list = "Ich sehe ";
-	if (raumnr != 6 || raumnr != 12 || raumnr != 18) {
-		list += "eine T<<üe<<r";
+	list += "eine Tuer";
+	if (raumnr == 3) {
+		list += " und eine Truhe";
 	}
-	drawscreen(raumnr, raumnr, raumnr, list);
+	if (raumnr == 4) {
+		list += " und einen Tisch";
+	}
+	if (raumnr == 6) {
+		list += " und einen Teppich";
+	}
+	if (raumnr == 10) {
+		list += " und einen Schrank";
+	}
+	drawscreen(raumnr, raumnr, raumnr, list, 0);
+}
+
+void dev() {
+	while (true) {
+		system("CLS");
+		cout << R"foo(
+   *--------------------*
+   | DeveloperMenu      |
+   | [1] Teleport       |
+   | [2] Spiel laden    |
+   | [3] Einstellungen  |
+   *--------------------*
+)foo" << endl;
+		//Einlesen der Antwort
+		char answer;
+		cin >> answer;
+		//SoundFX spielen
+		Mix_Chunk *click = Mix_LoadWAV(keyclick);
+		Mix_PlayChannel(-1, click, 0);
+		answer = atoi(&answer);
+		switch (answer) {
+		case 1:
+			cout << "In welchen Raum gehen?(0-18)" << endl;
+			int answerdev;
+			cin >> answerdev;
+			raumnr = answerdev;
+			startgame();
+			break;
+		case 2:loadgame();
+			break;
+		case 3:settings();
+			break;
+		}
+	}
 }
 
 void gameover() {
@@ -1214,11 +1308,82 @@ void gameover() {
 	}
 }
 void wingame() {
+	system("CLS");
 	//Starten der Hintergrundmusik
 	Mix_Music *music = Mix_LoadMUS(winmus);
 	Mix_PlayMusic(music, -1);
 	//Ausgabe der Intro-Animation
 	while (true) {
+		cout <<
+			R"foo(
+ __     __          __          ___
+ \ \   / /          \ \        / (_)
+  \ \_/ /__  _   _   \ \  /\  / / _ _ __
+   \   / _ \| | | |   \ \/  \/ / | | '_ \
+    | | (_) | |_| |    \  /\  /  | | | | |
+    |_|\___/ \__,_|     \/  \/   |_|_| |_|)foo";
+		Sleep(100);
+		system("CLS");
+		cout <<
+			R"foo(
+  __     __          __          ___
+ \ \   / /          \ \        / (_)
+  \ \_/ /__  _   _   \ \  /\  / / _ _ __
+   \   / _ \| | | |   \ \/  \/ / | | '_ \
+    | | (_) | |_| |    \  /\  /  | | | | |
+    |_|\___/ \__,_|     \/  \/   |_|_| |_|)foo";
+		Sleep(100);
+		system("CLS");
+		cout <<
+			R"foo(
+ __     __          __          ___
+  \ \   / /          \ \        / (_)
+  \ \_/ /__  _   _   \ \  /\  / / _ _ __
+   \   / _ \| | | |   \ \/  \/ / | | '_ \
+    | | (_) | |_| |    \  /\  /  | | | | |
+    |_|\___/ \__,_|     \/  \/   |_|_| |_|)foo";
+		Sleep(100);
+		system("CLS");
+		cout <<
+			R"foo(
+ __     __          __          ___
+ \ \   / /          \ \        / (_)
+   \ \_/ /__  _   _   \ \  /\  / / _ _ __
+   \   / _ \| | | |   \ \/  \/ / | | '_ \
+    | | (_) | |_| |    \  /\  /  | | | | |
+    |_|\___/ \__,_|     \/  \/   |_|_| |_|)foo";
+		Sleep(100);
+		system("CLS");
+		cout <<
+			R"foo(
+ __     __          __          ___
+ \ \   / /          \ \        / (_)
+  \ \_/ /__  _   _   \ \  /\  / / _ _ __
+    \   / _ \| | | |   \ \/  \/ / | | '_ \
+    | | (_) | |_| |    \  /\  /  | | | | |
+    |_|\___/ \__,_|     \/  \/   |_|_| |_|)foo";
+		Sleep(100);
+		system("CLS");
+		cout <<
+			R"foo(
+ __     __          __          ___
+ \ \   / /          \ \        / (_)
+  \ \_/ /__  _   _   \ \  /\  / / _ _ __
+   \   / _ \| | | |   \ \/  \/ / | | '_ \
+     | | (_) | |_| |    \  /\  /  | | | | |
+    |_|\___/ \__,_|     \/  \/   |_|_| |_|)foo";
+		Sleep(100);
+		system("CLS");
+		cout <<
+			R"foo(
+ __     __          __          ___
+ \ \   / /          \ \        / (_)
+  \ \_/ /__  _   _   \ \  /\  / / _ _ __
+   \   / _ \| | | |   \ \/  \/ / | | '_ \
+    | | (_) | |_| |    \  /\  /  | | | | |
+     |_|\___/ \__,_|     \/  \/   |_|_| |_|)foo";
+		Sleep(100);
+		system("CLS");
 		cout <<
 			R"foo(
  __     __          __          ___

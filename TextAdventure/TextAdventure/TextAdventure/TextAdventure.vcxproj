@@ -230,6 +230,10 @@
     <None Include="Help\basswma.chm" />
     <None Include="Help\basswv.chm" />
     <None Include="Help\bass_fx.chm" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="FodyWeavers.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
